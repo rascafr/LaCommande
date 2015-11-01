@@ -1,0 +1,169 @@
+<resources>
+    <string name="app_name">LaCommande</string>
+    <string name="activity_admin_clubs">Comptes Clubs</string>
+    <string name="activity_admin_plannings">Panning Caféteria</string>
+    <string name="action_settings">Settings</string>
+    
+    <!-- Sliding tabs Strings -->
+    <array name="tabs_names">
+        <item>Nouveau</item>
+        <item>Liste</item>
+        <item>Historique</item>
+        <item>Impayés</item>
+        <item>Déconnexion</item>
+    </array>
+
+    <array name="tabs_names_admin">
+        <item>Administrateur</item>
+        <item>Nouveau</item>
+        <item>Liste</item>
+        <item>Historique</item>
+        <item>Impayés</item>
+        <item>Déconnexion</item>
+    </array>
+
+    <!-- Login Activity Strings -->
+    <string name="login_hint">Login du club</string>
+    <string name="password_hint">••••••••</string>
+    <string name="login_instructions">Identification nécessaire</string>
+    <string name="login_instructions_2">Entrez le login et mot de passe\nqui vous ont été communiqués.</string>
+    <string name="login_button">CONNEXION</string>
+    <string name="login_credits">LaCommande V2.0</string>
+    <string name="login_credits_2">François Leparoux – ESEOmega 2015</string>
+
+    <!-- Salt -->
+    <string name="salt_login_club">Identification en cours</string>
+    <string name="salt_password">p8brURUs</string>
+    <string name="salt_sync_club">Compte administrateur</string>
+    <string name="salt_sync_planning">Compte logistique</string>
+    <string name="salt_sync_order">Commande impayée</string>
+
+    <!-- Admin items Strings -->
+    <string-array name="items_admin_titles">
+        <item>Comptes Clubs</item>
+        <item>Panning Caféteria</item>
+        <item>Menus et Elements</item>
+        <item>Gestion des stocks</item>
+    </string-array>
+
+    <string-array name="items_admin_descriptions">
+        <item>Ajoutez, modifiez les logins et mots de passe ou supprimez les comptes des clubs qui ont accès à la commande caféteria</item>
+        <item>Définissez les jours et heures d\'ouverture / fermeture du service de la caféteria</item>
+        <item>Ajoutez, modifiez ou supprimez les menus et élements qui sont proposés aux étudiants</item>
+        <item>Marquez un élement ou un ingrédient comme indisponible temporairement afin qu\'il n\'apparaîsse pas dans les menus proposés</item>
+    </string-array>
+
+    <array name="items_admin_icons">
+        <item>@drawable/ic_club_set</item>
+        <item>@drawable/ic_planner</item>
+        <item>@drawable/ic_ingredients</item>
+        <item>@drawable/ic_fish</item>
+    </array>
+
+    <string name="share_using">Partager depuis ...</string>
+
+    <!-- Random Strings for Password generation -->
+    <string-array name="password_samples">
+        <item>maecenas</item>
+        <item>non</item>
+        <item>tincidunt</item>
+        <item>ipsum</item>
+        <item>nunc</item>
+        <item>dignissim</item>
+        <item>nulla</item>
+        <item>est</item>
+        <item>nec</item>
+        <item>mattis</item>
+        <item>ligula</item>
+        <item>accumsan</item>
+        <item>eu</item>
+        <item>pellentesque</item>
+        <item>non</item>
+        <item>felis</item>
+        <item>non</item>
+        <item>nisl</item>
+        <item>suscipit</item>
+        <item>malesuada</item>
+        <item>phasellus</item>
+        <item>sed</item>
+        <item>augue</item>
+        <item>sit</item>
+        <item>amet</item>
+        <item>ante</item>
+        <item>hendrerit</item>
+        <item>efficitur</item>
+        <item>aliquam</item>
+        <item>gravida</item>
+        <item>blandit</item>
+        <item>odio</item>
+        <item>eu</item>
+        <item>consequat</item>
+        <item>magna</item>
+        <item>posuere</item>
+        <item>quis</item>
+        <item>aliquam</item>
+        <item>erat</item>
+        <item>volutpat</item>
+        <item>fusce</item>
+        <item>augue</item>
+        <item>elit</item>
+        <item>mollis</item>
+        <item>a</item>
+        <item>enim</item>
+        <item>in</item>
+        <item>commodo</item>
+        <item>fringilla</item>
+        <item>metus</item>
+        <item>sed</item>
+        <item>nec</item>
+        <item>dui</item>
+        <item>vitae</item>
+        <item>velit</item>
+        <item>interdum</item>
+        <item>ultrices</item>
+        <item>ut</item>
+        <item>nec</item>
+        <item>odio</item>
+        <item>duis</item>
+        <item>magna</item>
+        <item>lorem</item>
+        <item>cursus</item>
+        <item>id</item>
+        <item>sodales</item>
+        <item>et</item>
+        <item>rhoncus</item>
+        <item>eu</item>
+        <item>ipsum</item>
+        <item>pellentesque</item>
+        <item>eu</item>
+        <item>bibendum</item>
+        <item>nisi</item>
+        <item>eget</item>
+        <item>viverra</item>
+        <item>sem</item>
+        <item>donec</item>
+        <item>rutrum</item>
+        <item>quis</item>
+        <item>sem</item>
+        <item>ut</item>
+        <item>bibendum</item>
+        <item>duis</item>
+        <item>in</item>
+        <item>malesuada</item>
+        <item>mauris</item>
+        <item>in</item>
+        <item>efficitur</item>
+        <item>justo</item>
+        <item>mauris</item>
+        <item>leo</item>
+        <item>metus</item>
+        <item>placerat</item>
+        <item>eget</item>
+        <item>consectetur</item>
+        <item>nec</item>
+        <item>ullamcorper</item>
+        <item>eget</item>
+        <item>velit</item>
+    </string-array>
+
+</resources>

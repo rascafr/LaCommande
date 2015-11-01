@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyList"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/linearLayout"/>
+
+    <ProgressBar
+        android:id="@+id/progressOrders"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:background="@color/colorPrimary"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/linearLayout">
+
+        <TextView
+            android:id="@+id/tvUpdateInfoText"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dernière mise à jour : "/>
+
+        <TextView
+            android:layout_toRightOf="@id/tvUpdateInfoText"
+            android:layout_centerVertical="true"
+            android:id="@+id/tvUpdateInfo"
+            android:textColor="@color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="---"/>
+
+        <ImageView
+            android:id="@+id/icoNetwork"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="8dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:visibility="invisible"
+            android:src="@drawable/ic_connected"/>
+
+        <ProgressBar
+            android:id="@+id/progressNetwork"
+            android:layout_alignStart="@id/icoNetwork"
+            android:layout_alignEnd="@id/icoNetwork"
+            android:layout_width="20dp"
+            android:layout_height="20dp"/>
+
+        <TextView
+            android:layout_toLeftOf="@id/icoNetwork"
+            android:layout_marginRight="8dp"
+            android:layout_centerVertical="true"
+            android:id="@+id/tvNetworkInfo"
+            android:textColor="@color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Connexion"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_height="fill_parent"
+    android:layout_width="fill_parent">
+
+    <!-- Login Sub Layout -->
+    <LinearLayout
+        android:layout_weight="1"
+        android:layout_height="fill_parent"
+        android:layout_width="fill_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorPrimary"
+            android:gravity="center">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_marginTop="48dp"
+                android:orientation="vertical"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:text="@string/login_instructions"
+                    android:textSize="20sp"
+                    android:textColor="@color/white"
+                    android:layout_marginBottom="16dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/login_instructions_2"
+                    android:layout_marginBottom="16dp"
+                    android:textColor="@color/white"/>
+
+                <RelativeLayout
+                    android:layout_marginTop="16dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="4dp"
+                    android:paddingRight="4dp"
+                    android:background="@color/white"
+                    android:layout_marginBottom="8dp" >
+
+                    <EditText
+                        android:id="@+id/etLogin"
+                        android:layout_width="wrap_content"
+                        android:ems="13"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/login_hint" />
+
+                </RelativeLayout>
+
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:paddingLeft="4dp"
+                    android:paddingRight="4dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="16dp" >
+
+                    <EditText
+                        android:id="@+id/etPassword"
+                        android:inputType="textPassword"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:layout_width="wrap_content"
+                        android:ems="13"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/password_hint" />
+
+                </RelativeLayout>
+
+                <Button
+                    android:id="@+id/bpConnect"
+                    android:layout_marginTop="16dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/flat_selector"
+                    android:textColor="@color/white"
+                    android:text="@string/login_button" />
+
+                <ProgressBar
+                    android:layout_marginTop="16dp"
+                    android:id="@+id/progressConnect"
+                    android:visibility="invisible"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_marginTop="24dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:text="@string/login_credits"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:text="@string/login_credits_2"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <!-- Picture Sub Layout -->
+    <LinearLayout
+        android:layout_weight="1"
+        android:layout_height="fill_parent"
+        android:layout_width="fill_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/login_background"
+                android:scaleType="centerCrop"/>
+
+            <View
+                android:layout_width="5dp"
+                android:layout_height="fill_parent"
+                android:background="@drawable/vert_shadow" >
+            </View>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

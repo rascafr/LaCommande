@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/etClubName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="16"
+        android:hint="Nom du club"
+        android:singleLine="true"
+        android:maxLines="1"/>
+
+    <EditText
+        android:id="@+id/etClubLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="16"
+        android:layout_below="@id/etClubName"
+        android:hint="Login du club"
+        android:singleLine="true"
+        android:maxLines="1"/>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/etClubLogin"
+        android:id="@+id/relativeLayout"
+        android:gravity="center_vertical"
+        android:layout_alignEnd="@+id/etClubLogin"
+        android:layout_alignParentStart="true">
+
+        <EditText
+            android:id="@+id/etClubPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Mot de passe"
+            android:singleLine="true"
+            android:inputType="textPassword"
+            android:maxLines="1"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@+id/rlRandom"/>
+
+        <RelativeLayout
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/flat_selector_layout"
+            android:layout_marginLeft="8dp"
+            android:clickable="true"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:id="@+id/rlRandom">
+
+
+
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <CheckBox
+        android:layout_below="@id/relativeLayout"
+        android:layout_marginTop="16dp"
+        android:id="@+id/checkPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mot de passe visible"/>
+
+    <CheckBox
+        android:layout_below="@id/checkPassword"
+        android:id="@+id/checkAdmin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Compte Administrateur"/>
+
+    <CheckBox
+        android:layout_below="@id/checkAdmin"
+        android:id="@+id/checkEnabled"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Compte Activé"/>
+
+</RelativeLayout>
