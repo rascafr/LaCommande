@@ -1,4 +1,4 @@
-package fr.bde_eseo.lacommande;
+package fr.bde_eseo.lacommande.model;
 
 /**
  * Created by Rascafr on 24/10/2015.

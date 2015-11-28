@@ -28,4 +28,7 @@ public class Constants {
     public final static String URL_CURRENT_ORDERS_GET = URL_SERVER + "apps-lacommande/v10/getCurrentOrders.php";
     public final static String URL_CURRENT_ORDER_SYNC = URL_SERVER + "apps-lacommande/v10/syncCurrentOrder.php";
 
+    // Cafeteria Data
+    public final static String URL_DATA_GET = URL_SERVER + "apps-lacommande/v10/syncData.php";
+
 }

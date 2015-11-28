@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:card_view="http://schemas.android.com/apk/res-auto"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <LinearLayout
+          android:orientation="horizontal"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:baselineAligned="false"
+          android:background="@color/md_grey_700"
+          android:layout_above="@+id/linearLayout2">
+
+        <RelativeLayout
+            android:layout_weight="0.20"
+            android:layout_width="0dp"
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyListCategories"
+                android:background="@color/md_grey_600"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"/>
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="16dp"
+            android:orientation="vertical"
+            android:layout_height="match_parent"
+            android:background="@drawable/back_degrade_rev"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_toEndOf="@+id/recyListCategories"/>
+
+        <LinearLayout
+            android:layout_weight="0.70"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" >
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyListItems"
+                android:layout_marginLeft="28dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_weight="0.30"
+            android:layout_width="0dp"
+            android:orientation="horizontal"
+            android:paddingLeft="8dp"
+            android:layout_height="match_parent" >
+
+            <LinearLayout
+                android:layout_width="16dp"
+                android:orientation="vertical"
+                android:layout_height="match_parent"
+                android:background="@drawable/back_degrade"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:background="@color/md_grey_600"
+                android:layout_height="match_parent" >
+
+                <TextView
+                    android:id="@+id/tvResume"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:text="Panier (5 éléments)"/>
+
+                <TextView
+                    android:id="@+id/tvSumPrice"
+                    android:layout_alignParentBottom="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:text="Total : 10,45€"/>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recyListResume"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@id/tvResume"
+                    android:layout_above="@+id/tvSumPrice"/>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/abc_action_bar_default_height_material"
+        android:orientation="horizontal"
+        android:background="@color/md_grey_800"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:paddingRight="8dp"
+        android:id="@+id/linearLayout2">
+
+        <ImageView
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginLeft="16dp"
+            android:id="@+id/assistIcon"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_question"/>
+
+        <TextView
+            android:id="@+id/tvStackMoreText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ajoutez les ingrédients pour sandwich chaud"
+            android:layout_marginLeft="16dp"
+            android:layout_toRightOf="@id/assistIcon"
+            android:paddingLeft="16dp"
+            android:paddingRight="8dp"
+            android:gravity="left"
+            android:textSize="16sp"
+            android:textColor="@color/md_grey_800"
+            android:layout_centerVertical="true"/>
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/help_speech"
+            android:layout_centerVertical="true"
+            android:id="@+id/view2"
+            android:layout_alignStart="@+id/tvStackMoreText"
+            android:layout_alignEnd="@+id/tvStackMoreText"/>
+
+        <Button
+            android:id="@+id/buttonValid"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textColor="@color/white"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_centerVertical="true"
+            android:background="@drawable/flat_stack_button"
+            android:layout_alignParentRight="true"
+            android:textSize="16sp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:text="Valider"/>
+
+        <Button
+            android:id="@+id/buttonCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textColor="@color/white"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:background="@drawable/flat_stack_button"
+            android:textSize="16sp"
+            android:text="Annuler"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:layout_toLeftOf="@+id/buttonValid"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>

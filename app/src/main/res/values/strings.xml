@@ -3,10 +3,12 @@
     <string name="activity_admin_clubs">Comptes Clubs</string>
     <string name="activity_admin_plannings">Panning Caféteria</string>
     <string name="action_settings">Settings</string>
+    <string name="activity_clients">Liste des clients</string>
+    <string name="activity_order">Nouvelle commande</string>
     
     <!-- Sliding tabs Strings -->
     <array name="tabs_names">
-        <item>Nouveau</item>
+        <item>Comptoir</item>
         <item>Liste</item>
         <item>Historique</item>
         <item>Impayés</item>
@@ -15,7 +17,7 @@
 
     <array name="tabs_names_admin">
         <item>Administrateur</item>
-        <item>Nouveau</item>
+        <item>Comptoir</item>
         <item>Liste</item>
         <item>Historique</item>
         <item>Impayés</item>

@@ -6,8 +6,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import fr.bde_eseo.lacommande.tabs.AdminTab;
+import fr.bde_eseo.lacommande.tabs.EmptyTab;
 import fr.bde_eseo.lacommande.tabs.HistoryTab;
 import fr.bde_eseo.lacommande.tabs.NewOrderTab;
+import fr.bde_eseo.lacommande.tabs.NewTab;
 import fr.bde_eseo.lacommande.tabs.OrdersTab;
 
 
@@ -39,7 +41,7 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
                 return new AdminTab();
 
             case 0:
-                return new NewOrderTab();
+                return new NewTab();
 
             case 1:
                 return new OrdersTab();
@@ -48,10 +50,10 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
                 return new HistoryTab();
 
             case 3:
-                return new NewOrderTab();
+                return new EmptyTab();
 
             case 4:
-                return new NewOrderTab();
+                return new EmptyTab();
         }
         return null;
     }

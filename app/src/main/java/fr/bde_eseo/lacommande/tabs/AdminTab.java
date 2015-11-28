@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -81,15 +82,16 @@ public class AdminTab extends Fragment {
                         break;
 
                     case ACTION_MENUS:
-
+                        Toast.makeText(getActivity(), "Fonctionnalité non disponible", Toast.LENGTH_SHORT).show();
                         break;
 
                     case ACTION_STOCKS:
-
+                        Toast.makeText(getActivity(), "Fonctionnalité non disponible", Toast.LENGTH_SHORT).show();
                         break;
                 }
 
-                getActivity().startActivity(myIntent);
+                if (myIntent != null)
+                    getActivity().startActivity(myIntent);
 
             }
         }));

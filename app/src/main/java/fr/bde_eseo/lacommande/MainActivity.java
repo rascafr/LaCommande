@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
-import fr.bde_eseo.lacommande.R;
+import fr.bde_eseo.lacommande.model.DataStore;
 import fr.bde_eseo.lacommande.slidingtab.SlidingTabLayout;
 import fr.bde_eseo.lacommande.slidingtab.ViewPagerAdapter;
 

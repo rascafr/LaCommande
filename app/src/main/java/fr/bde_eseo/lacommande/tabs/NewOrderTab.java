@@ -40,7 +40,7 @@ public class NewOrderTab extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.tab_new_order, container, false);
+        View rootView = inflater.inflate(R.layout.tab_new_order2, container, false);
 
         logins = new ArrayList<>();
         adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_dropdown_item_1line, logins);
