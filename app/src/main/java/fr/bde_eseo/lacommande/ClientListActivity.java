@@ -109,7 +109,7 @@ public class ClientListActivity extends AppCompatActivity {
         });
 
         // Init model
-        DataStore.getInstance().initClientArray();
+        //DataStore.getInstance().initClientArray();
 
         // Init adapter and recycler object
         mAdapter = new ClientItemAdapter();
@@ -120,58 +120,13 @@ public class ClientListActivity extends AppCompatActivity {
         recyList.setLayoutManager(llm);
 
         // Download data from server
+        /*
         AsyncLogin asyncLogin = new AsyncLogin();
         asyncLogin.execute(Constants.URL_CLIENTS_LISTS);
+        */
+        fillHeaderArray();
+        mAdapter.notifyDataSetChanged();
 
-    }
-
-    private class AsyncLogin extends AsyncTask<String, String, String> {
-
-        @Override
-        protected String doInBackground(String... url) {
-            return ConnexionUtils.postServerData(url[0], null);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressClient.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected void onPostExecute(String data) {
-            super.onPostExecute(data);
-
-            progressClient.setVisibility(View.INVISIBLE);
-            if (Utilities.isNetworkDataValid(data)) {
-
-                try {
-
-                    // Fill array with raw data (unsorted names)
-                    JSONArray array = new JSONArray(data);
-                    for (int i=0;i<array.length();i++) {
-                        DataStore.getInstance().getClientItems().add(new ClientItem(array.getJSONObject(i)));
-                    }
-
-                    // Sort data by names
-                    Collections.sort(DataStore.getInstance().getClientItems(), new Comparator<ClientItem>() {
-                        @Override
-                        public int compare(ClientItem lhs, ClientItem rhs) {
-                            return lhs.getName().compareToIgnoreCase(rhs.getName());
-                        }
-                    });
-
-                    fillHeaderArray();
-
-                    mAdapter.notifyDataSetChanged();
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                Toast.makeText(ClientListActivity.this, "Erreur réseau !", Toast.LENGTH_SHORT).show();
-            }
-        }
     }
 
     private class ClientItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {

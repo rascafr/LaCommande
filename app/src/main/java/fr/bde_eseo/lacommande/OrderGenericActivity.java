@@ -7,10 +7,12 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,8 +20,13 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import fr.bde_eseo.lacommande.model.CartItem;
 import fr.bde_eseo.lacommande.model.CategoryItem;
@@ -44,6 +51,7 @@ public class OrderGenericActivity extends AppCompatActivity {
     private TextView tvTotal;
     private TextView tvIndicator;
     private TextView tvResume;
+    private EditText etInstr;
 
     // Adapters
     private CartAdapter cartAdapter;
@@ -61,6 +69,7 @@ public class OrderGenericActivity extends AppCompatActivity {
     // Others
     private int selectedItem = 0;
     private int currentMode = MODE_NAVIGATE;
+    private String clientName;
 
     // Current object
     private RootItem selectedMenu;
@@ -78,6 +87,21 @@ public class OrderGenericActivity extends AppCompatActivity {
 
         // Set UI Main Layout
         setContentView(R.layout.activity_generic_order);
+
+        // Get intent's parameters
+        if (savedInstanceState == null) {
+            Bundle extras = getIntent().getExtras();
+            if(extras == null) {
+                Toast.makeText(OrderGenericActivity.this, "Erreur de l'application (c'est pas normal)", Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                clientName = extras.getString(Constants.KEY_NEW_ORDER_CLIENT);
+                getSupportActionBar().setTitle(getString(R.string.activity_order) + " (" + clientName + ")");
+            }
+        } else {
+            clientName = (String) savedInstanceState.getSerializable(Constants.KEY_NEW_ORDER_CLIENT);
+            getSupportActionBar().setTitle(getString(R.string.activity_order) + " (" + clientName + ")");
+        }
 
         // Get layout object
         recyListResume = (RecyclerView) findViewById(R.id.recyListResume);
@@ -135,6 +159,7 @@ public class OrderGenericActivity extends AppCompatActivity {
         // Init layout objects
         tvIndicator.bringToFront();
         initLayout();
+        updateButtonProperties();
 
         // Notify adapters
         cartAdapter.notifyDataSetChanged();
@@ -142,7 +167,7 @@ public class OrderGenericActivity extends AppCompatActivity {
         displayAdapter.notifyDataSetChanged();
 
         // Download data from server
-        AsyncData asyncData = new AsyncData();
+        final AsyncData asyncData = new AsyncData();
         asyncData.execute(Constants.URL_DATA_GET);
 
         // Buttons on-clic listener
@@ -161,8 +186,48 @@ public class OrderGenericActivity extends AppCompatActivity {
                     case MODE_ELEMENTS_PRIMARY:
                         currentMode = MODE_NAVIGATE;
                         break;
+
+                    // If mode is Navigate, send order to cookers
+                    case MODE_NAVIGATE:
+
+                        MaterialDialog md = new MaterialDialog.Builder(OrderGenericActivity.this)
+                                .customView(R.layout.dialog_add_instructions, false)
+                                .title("Ajouter un commentaire ?")
+                                .positiveText("Finaliser la commande")
+                                .negativeText("Annuler")
+                                .cancelable(false)
+                                .positiveText("Confirmer")
+                                .negativeText("Annuler")
+                                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                    @Override
+                                    public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
+                                        DataStore.getInstance().setInstructions(
+                                                // Convert InputText into formatted string without Emojis / Unicode characters
+                                                etInstr
+                                                        .getText()
+                                                        .toString()
+                                                        .trim()
+                                        );
+                                        AsyncPostCart asyncPostCart = new AsyncPostCart();
+                                        asyncPostCart.execute(Constants.URL_CART_SYNC);
+
+                                    }
+                                })
+                                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                    @Override
+                                    public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
+                                        materialDialog.hide();
+                                    }
+                                })
+                                .build();
+
+                        etInstr = ((EditText)(md.getView().findViewById(R.id.etInstructions)));
+                        md.show();
+
+                        break;
                 }
 
+                updateButtonProperties();
                 updateDisplayArray(0);
             }
         });
@@ -376,6 +441,84 @@ public class OrderGenericActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(OrderGenericActivity.this, "Erreur réseau", Toast.LENGTH_SHORT).show();
             }
+        }
+    }
+
+    private class AsyncPostCart extends AsyncTask<String, String, String> {
+
+        private MaterialDialog materialDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            materialDialog = new MaterialDialog.Builder(OrderGenericActivity.this)
+                    .title("Envoi de la commande")
+                    .content("Veuillez patientier ...")
+                    .cancelable(false)
+                    .progress(true, 4)
+                    .progressIndeterminateStyle(false)
+                    .show();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String JSONstr = DataStore.getInstance().outputJSON();
+            String instr = DataStore.getInstance().getInstructions();
+            String resp = null;
+
+            try {
+                HashMap<String, String> pairs = new HashMap<>();
+                pairs.put("token", DataStore.getInstance().getToken());
+                pairs.put("data", Base64.encodeToString(JSONstr.getBytes("UTF-8"), Base64.NO_WRAP));
+                pairs.put("instructions", Base64.encodeToString(instr.getBytes("UTF-8"), Base64.NO_WRAP));
+                resp = ConnexionUtils.postServerData(params[0], pairs);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+
+            return resp;
+        }
+
+        @Override
+        protected void onPostExecute(String data) {
+            super.onPostExecute(data);
+
+            materialDialog.hide();
+
+            if (Utilities.isNetworkDataValid(data)) {
+                try {
+                    JSONObject obj = new JSONObject(data);
+                    if (obj.getInt("result") == 1) {
+                        materialDialog = new MaterialDialog.Builder(OrderGenericActivity.this)
+                                .title("Commande envoyée !")
+                                .content("Celle-ci est désormais visible en cuisine.\n" +
+                                        "Vous pouvez maintenant encaisser le client depuis l'onglet \"Liste\".")
+                                .cancelable(false)
+                                .negativeText("Fermer")
+                                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                    @Override
+                                    public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
+                                        OrderGenericActivity.this.finish();
+                                    }
+                                })
+                                .show();
+                    } else {
+                        materialDialog = new MaterialDialog.Builder(OrderGenericActivity.this)
+                                .title("Erreur")
+                                .content(obj.getString("cause"))
+                                .cancelable(false)
+                                .negativeText("Fermer")
+                                .show();
+                    }
+                } catch (JSONException e) {
+                    Toast.makeText(OrderGenericActivity.this, "Erreur serveur", Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
+            } else {
+                Toast.makeText(OrderGenericActivity.this, "Erreur réseau", Toast.LENGTH_SHORT).show();
+            }
+
         }
     }
 
@@ -600,5 +743,25 @@ public class OrderGenericActivity extends AppCompatActivity {
             }
         }
         return rootPos;
+    }
+
+    // Set the stacked buttons names and visibilities (depends of the current mode value)
+    public void updateButtonProperties() {
+
+        switch (currentMode) {
+
+            case MODE_NAVIGATE:
+                buttonValid.setText("Finaliser");
+                buttonValid.setVisibility(View.VISIBLE);
+                buttonCancel.setVisibility(View.INVISIBLE);
+                break;
+
+            case MODE_INGREDIENTS:
+                buttonValid.setText("Terminer");
+                buttonValid.setVisibility(View.VISIBLE);
+                buttonValid.setText("Annuler");
+                buttonCancel.setVisibility(View.VISIBLE);
+                break;
+        }
     }
 }

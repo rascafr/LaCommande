@@ -39,6 +39,7 @@
     <string name="salt_sync_club">Compte administrateur</string>
     <string name="salt_sync_planning">Compte logistique</string>
     <string name="salt_sync_order">Commande impayée</string>
+    <string name="salt_get_token">Paramètres requis : %s</string>
 
     <!-- Admin items Strings -->
     <string-array name="items_admin_titles">

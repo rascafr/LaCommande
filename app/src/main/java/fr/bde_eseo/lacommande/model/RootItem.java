@@ -99,4 +99,36 @@ public class RootItem {
 
         return realPrice;
     }
+
+    // Returns a JSON object as String
+    public String toJSONString () {
+        String strJson = "{";
+        switch (type) {
+            case ElementItem.TYPE:
+                strJson += "\"element\":\"" + id + "\"";
+                if (items != null && items.size() > 0) {
+                    strJson += ", \"items\":[";
+                    for (int i=0;i<items.size();i++) {
+                        if (i!=0) strJson += ", ";
+                        strJson += "\"" + items.get(i).id + "\"";
+                    }
+                    strJson += "]";
+                }
+                break;
+
+            case MenuItem.TYPE:
+                strJson += "\"menu\":\"" + id + "\"";
+                if (items != null && items.size() > 0) {
+                    strJson += ", \"items\":[";
+                    for (int i=0;i<items.size();i++) {
+                        if (i!=0) strJson += ", ";
+                        strJson += items.get(i).toJSONString();
+                    }
+                    strJson += "]";
+                }
+                break;
+        }
+        strJson += "}";
+        return strJson;
+    }
 }

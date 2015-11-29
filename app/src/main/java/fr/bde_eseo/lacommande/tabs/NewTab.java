@@ -3,6 +3,7 @@ package fr.bde_eseo.lacommande.tabs;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.util.Log;
@@ -18,14 +19,22 @@ import com.afollestad.materialdialogs.MaterialDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 
+import fr.bde_eseo.lacommande.BuildConfig;
 import fr.bde_eseo.lacommande.ClientListActivity;
 import fr.bde_eseo.lacommande.Constants;
 import fr.bde_eseo.lacommande.OrderGenericActivity;
 import fr.bde_eseo.lacommande.R;
+import fr.bde_eseo.lacommande.model.ClientItem;
+import fr.bde_eseo.lacommande.model.DataStore;
 import fr.bde_eseo.lacommande.utils.ConnexionUtils;
+import fr.bde_eseo.lacommande.utils.EncryptUtils;
 import fr.bde_eseo.lacommande.utils.Utilities;
 
 /**
@@ -50,11 +59,8 @@ public class NewTab extends Fragment {
         cardViewClients = (CardView) rootView.findViewById(R.id.cardUsers);
 
         // Set data
-        logins = new ArrayList<>();
-        adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_dropdown_item_1line, logins);
-
-        AsyncLogin asyncLogin = new AsyncLogin();
-        asyncLogin.execute(Constants.URL_CLIENTS_LISTS);
+        fillEditTextData();
+        adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_dropdown_item_1line, logins);
 
         // On click listener (add new order -> user choose dialog)
         cardViewOrder.setOnClickListener(new View.OnClickListener() {
@@ -67,9 +73,15 @@ public class NewTab extends Fragment {
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
-                                Toast.makeText(getActivity(), "Select : " + autoCompleteTextView.getText().toString(), Toast.LENGTH_SHORT).show();
-                                Intent i = new Intent(getActivity(), OrderGenericActivity.class);
-                                getActivity().startActivity(i);
+                                String clientName = autoCompleteTextView.getText().toString();
+                                AsyncToken asyncToken = new AsyncToken(
+                                        DataStore.getInstance().getClubMember().getLogin(),
+                                        DataStore.getInstance().getClubMember().getPassword(),
+                                        DataStore.getInstance().searchForClient(clientName).getLogin(),
+                                        BuildConfig.VERSION_NAME,
+                                        clientName
+                                );
+                                asyncToken.execute(Constants.URL_TOKEN_GET);
                             }
                         })
                         .cancelable(true);
@@ -93,7 +105,94 @@ public class NewTab extends Fragment {
         return rootView;
     }
 
-    private class AsyncLogin extends AsyncTask<String, String, String> {
+    private class AsyncToken extends AsyncTask<String, String, String> {
+
+        private String loginClub, passwordClub, loginClient, version, clientName;
+        private MaterialDialog materialDialog;
+
+        public AsyncToken(String loginClub, String passwordClub, String loginClient, String version, String clientName) {
+            this.loginClub = loginClub;
+            this.passwordClub = passwordClub;
+            this.loginClient = loginClient;
+            this.version = version;
+            this.clientName = clientName;
+        }
+
+        @Override
+        protected String doInBackground(String... url) {
+            HashMap<String, String> pairs = new HashMap<>();
+            String hash = EncryptUtils.sha256(
+                    getString(R.string.salt_get_token) +
+                            loginClub +
+                            passwordClub +
+                            loginClient +
+                            version
+            );
+            pairs.put("loginClub", loginClub);
+            pairs.put("passwordClub", passwordClub);
+            pairs.put("loginClient", loginClient);
+            pairs.put("version", version);
+            pairs.put("hash", hash);
+
+            return ConnexionUtils.postServerData(url[0], pairs);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            materialDialog = new MaterialDialog.Builder(getActivity())
+                    .title("Préparation")
+                    .content("Veuillez patienter ...")
+                    .cancelable(false)
+                    .progress(true, 4)
+                    .progressIndeterminateStyle(false)
+                    .show();
+        }
+
+        @Override
+        protected void onPostExecute(final String data) {
+            super.onPostExecute(data);
+
+            // Wait a little
+            new Handler().postDelayed(
+                    new Runnable() {
+
+                        @Override
+                        public void run() {
+
+                            materialDialog.hide();
+
+                            if (Utilities.isNetworkDataValid(data)) {
+                                try {
+                                    JSONObject obj = new JSONObject(data);
+
+                                    if (obj.getInt("result") == 1) {
+                                        DataStore.getInstance().setToken(obj.getString("token"));
+                                        Intent i = new Intent(getActivity(), OrderGenericActivity.class);
+                                        i.putExtra(Constants.KEY_NEW_ORDER_CLIENT, clientName);
+                                        getActivity().startActivity(i);
+                                    } else {
+                                        materialDialog = new MaterialDialog.Builder(getActivity())
+                                                .title("Erreur")
+                                                .content(obj.getString("cause"))
+                                                .cancelable(false)
+                                                .negativeText("Fermer")
+                                                .show();
+                                    }
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                    Toast.makeText(getActivity(), "Erreur serveur", Toast.LENGTH_SHORT).show();
+                                }
+                            } else {
+                                Toast.makeText(getActivity(), "Erreur réseau", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }, 1500);
+        }
+    }
+
+    private class AsyncLoginOld extends AsyncTask<String, String, String> {
 
         @Override
         protected String doInBackground(String... url) {
@@ -122,6 +221,18 @@ public class NewTab extends Fragment {
                     e.printStackTrace();
                 }
             }
+        }
+    }
+
+    // Fill the autocomplete edittext with client's data
+    private void fillEditTextData () {
+        if (logins == null)
+            logins = new ArrayList<>();
+        else
+            logins.clear();
+
+        for (int i=0;i<DataStore.getInstance().getClientItems().size();i++) {
+            logins.add(DataStore.getInstance().getClientItems().get(i).getFullname());
         }
     }
 }

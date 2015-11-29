@@ -11,10 +11,14 @@
         android:textSize="18sp"
         android:text="Entrez le nom ou prénom du client :"/>
 
+
     <AutoCompleteTextView
         android:id="@+id/autocomplete"
         android:layout_marginTop="16dp"
         android:hint="Tyler Durden"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:dropDownHeight="150dp"
         android:layout_width="300dp"
         android:layout_height="wrap_content"/>
 

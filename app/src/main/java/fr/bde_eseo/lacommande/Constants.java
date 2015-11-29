@@ -6,6 +6,16 @@ package fr.bde_eseo.lacommande;
 public class Constants {
 
     /**
+     * General
+     */
+    public static final String APP_VERSION = "1.0";
+
+    /**
+     * Intent keys
+     */
+    public static final String KEY_NEW_ORDER_CLIENT = "intent.clientlistactivity.clientname";
+
+    /**
      * URL LIST
      */
 
@@ -30,5 +40,11 @@ public class Constants {
 
     // Cafeteria Data
     public final static String URL_DATA_GET = URL_SERVER + "apps-lacommande/v10/syncData.php";
+
+    // Token recuperation
+    public final static String URL_TOKEN_GET = URL_SERVER + "apps-lacommande/v10/syncDate-token.php";
+
+    // Cart synchronization
+    public final static String URL_CART_SYNC = URL_SERVER + "apps-lacommande/v10/syncOrder-token.php";
 
 }

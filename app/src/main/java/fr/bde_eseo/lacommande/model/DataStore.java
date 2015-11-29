@@ -50,6 +50,17 @@ public class DataStore {
         return clientItems;
     }
 
+    // Returns a client object if name is found
+    public ClientItem searchForClient (String name) {
+        ClientItem clientItem = null;
+        for (int i=0;i<clientItems.size() && clientItem == null;i++) {
+            if (clientItems.get(i).getFullname().equals(name)) {
+                clientItem = clientItems.get(i);
+            }
+        }
+        return clientItem;
+    }
+
     /**
      * Cart
      */
@@ -181,4 +192,45 @@ public class DataStore {
         return tot;
     }
 
+    /**
+     * Order token
+     */
+    private String token;
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    /**
+     * For Cart JSON output
+     */
+    public String outputJSON () {
+        String json = "["; // Array begin
+
+        for (int i=0;i<cartItems.size();i++) {
+            if (i!=0) json += ", ";
+            json += cartItems.get(i).toJSONString();
+        }
+
+        json += "]";
+
+        return json;
+    }
+
+    /**
+     * Instructions
+     */
+    private String instructions;
+
+    public String getInstructions() {
+        return instructions;
+    }
+
+    public void setInstructions(String instructions) {
+        this.instructions = instructions;
+    }
 }
