@@ -118,7 +118,7 @@ public class LoginActivity extends AppCompatActivity {
             String message = "Impossible d'accéder au réseau.\nVeuillez vérifier l'état de la connexion internet.";
             int error = 1;
             progressConnect.setVisibility(View.INVISIBLE);
-            tvProgress.setVisibility(View.INVISIBLE);
+            tvProgress.setVisibility(View.GONE);
 
             if (Utilities.isNetworkDataValid(result)) {
                 if (result.startsWith("1")) {
