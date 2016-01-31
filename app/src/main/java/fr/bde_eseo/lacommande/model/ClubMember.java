@@ -1,5 +1,13 @@
 package fr.bde_eseo.lacommande.model;
 
+import android.content.Context;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import fr.bde_eseo.lacommande.R;
+import fr.bde_eseo.lacommande.utils.EncryptUtils;
+
 /**
  * Created by Rascafr on 24/10/2015.
  */
@@ -13,6 +21,13 @@ public class ClubMember {
         this.login = login;
         this.password = password;
         this.level = level;
+    }
+
+    public ClubMember(String login, String password, JSONObject obj) throws JSONException {
+        this.name = obj.getString("name");
+        this.login = login;
+        this.password = password;
+        this.level = obj.getInt("level");
     }
 
     public boolean isAdmin() {

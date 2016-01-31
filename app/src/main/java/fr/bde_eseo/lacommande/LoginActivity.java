@@ -1,6 +1,8 @@
 package fr.bde_eseo.lacommande;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -26,6 +28,8 @@ import java.util.Locale;
 import fr.bde_eseo.lacommande.model.ClientItem;
 import fr.bde_eseo.lacommande.model.ClubMember;
 import fr.bde_eseo.lacommande.model.DataStore;
+import fr.bde_eseo.lacommande.utils.APIResponse;
+import fr.bde_eseo.lacommande.utils.APIUtils;
 import fr.bde_eseo.lacommande.utils.ConnexionUtils;
 import fr.bde_eseo.lacommande.utils.EncryptUtils;
 import fr.bde_eseo.lacommande.utils.Utilities;
@@ -42,9 +46,21 @@ public class LoginActivity extends AppCompatActivity {
     private ProgressBar progressConnect;
     private TextView tvProgress;
 
+    // Android
+    private Context context;
+
+    // Preferences
+    private SharedPreferences prefs;
+    private SharedPreferences.Editor prefs_Write;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        context = LoginActivity.this;
+
+        // Preferences
+        prefs = getSharedPreferences(Constants.PREFS_IDENTIFIER, 0);
+        prefs_Write = prefs.edit();
 
         // Set UI Main Layout
         setContentView(R.layout.activity_login);
@@ -55,6 +71,9 @@ public class LoginActivity extends AppCompatActivity {
         etPassword = (EditText) findViewById(R.id.etPassword);
         progressConnect = (ProgressBar) findViewById(R.id.progressConnect);
         tvProgress = (TextView) findViewById(R.id.tvProgress);
+
+        // Set view
+        etLogin.setText(prefs.getString(Constants.PREFS_KEY_LOGIN, ""));
 
         // Listen for connexion intent
         bpConnect.setOnClickListener(new View.OnClickListener() {
@@ -79,26 +98,20 @@ public class LoginActivity extends AppCompatActivity {
 
 
     // Custom Async Task to connect club
-    private class AsyncConnectClub extends AsyncTask<String, String, String> {
+    private class AsyncConnectClub extends AsyncTask<String, String, APIResponse> {
 
         private String login;
         private String password;
         private String version;
-        private String hash;
 
         @Override
-        protected String doInBackground(String... params) {
+        protected APIResponse doInBackground(String... params) {
             HashMap<String, String> pairs = new HashMap<>();
             pairs.put("login", login);
             pairs.put("password", password);
             pairs.put("version", version);
-            pairs.put("hash", hash);
 
-            if (Utilities.isOnline(LoginActivity.this)) {
-                return ConnexionUtils.postServerData(Constants.URL_LOGIN_CLUB, pairs);
-            } else {
-                return null;
-            }
+            return APIUtils.postAPIData(Constants.API_CLUB_LOGIN, pairs, context);
         }
 
         @Override
@@ -107,58 +120,41 @@ public class LoginActivity extends AppCompatActivity {
             etLogin.setText(login);
             password = EncryptUtils.sha256(etPassword.getText().toString() + getResources().getString(R.string.salt_password));
             version = BuildConfig.VERSION_NAME;
-            hash = EncryptUtils.sha256(login+password+version+getResources().getString(R.string.salt_login_club));
             tvProgress.setVisibility(View.VISIBLE);
             tvProgress.setText("Authentification ...");
         }
 
         @Override
-        protected void onPostExecute(String result) {
+        protected void onPostExecute(final APIResponse apiResponse) {
 
-            String message = "Impossible d'accéder au réseau.\nVeuillez vérifier l'état de la connexion internet.";
-            int error = 1;
-            progressConnect.setVisibility(View.INVISIBLE);
-            tvProgress.setVisibility(View.GONE);
+            if (apiResponse.isValid()) {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
 
-            if (Utilities.isNetworkDataValid(result)) {
-                if (result.startsWith("1")) {
+                            // Login ok
+                            tvProgress.setText("Connecté");
+                            DataStore.getInstance().setClubMember(new ClubMember(login, password, apiResponse.getJsonData()));
 
-                    try {
-                        JSONObject obj = new JSONObject(result.substring(1));
-                        DataStore.getInstance().setClubMember(new ClubMember(obj.getString("name"), login, password, obj.getInt("level")));
-                        error = 0;
+                            // Save login
+                            prefs_Write.putString(Constants.PREFS_KEY_LOGIN, login);
+                            prefs_Write.apply();
 
-                        AsyncClients asyncClients = new AsyncClients();
-                        asyncClients.execute(Constants.URL_CLIENTS_LISTS);
+                            // Update client data
+                            AsyncClients asyncClients = new AsyncClients();
+                            asyncClients.execute(Constants.URL_CLIENTS_LISTS);
 
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                        } catch (JSONException e) {
+                            tvProgress.setText("Erreur serveur");
+                            progressConnect.setVisibility(View.GONE);
+                            e.printStackTrace();
+                        }
                     }
-
-                } else if (result.equals("-1")) {
-                    message = "Le mot de passe saisi est incorrect.";
-                } else if (result.equals("-2")) {
-                    message = "L'identifiant saisi est incorrect.";
-                } else if (result.equals("-3")) {
-                    message = "Le compte auquel vous tentez d'accéder n'est pas activé.";
-                } else {
-                    message = "Code d'erreur : inconnu.\nContactez un développeur !";
-                }
-            }
-
-            if (error == 1) {
-                new MaterialDialog.Builder(LoginActivity.this)
-                        .title("Erreur")
-                        .content(message)
-                        .cancelable(false)
-                        .callback(new MaterialDialog.ButtonCallback() {
-                            @Override
-                            public void onNegative(MaterialDialog dialog) {
-                                super.onNegative(dialog);
-                            }
-                        })
-                        .negativeText("Fermer")
-                        .show();
+                }, 1500);
+            } else {
+                tvProgress.setText(apiResponse.getError());
+                progressConnect.setVisibility(View.GONE);
             }
         }
     }
@@ -185,7 +181,7 @@ public class LoginActivity extends AppCompatActivity {
             super.onPostExecute(data);
 
             progressConnect.setVisibility(View.INVISIBLE);
-            progressConnect.setVisibility(View.INVISIBLE);
+            tvProgress.setVisibility(View.INVISIBLE);
 
             if (Utilities.isNetworkDataValid(data)) {
 
@@ -196,7 +192,7 @@ public class LoginActivity extends AppCompatActivity {
 
                     // Fill array with raw data (unsorted names)
                     JSONArray array = new JSONArray(data);
-                    for (int i=0;i<array.length();i++) {
+                    for (int i = 0; i < array.length(); i++) {
                         DataStore.getInstance().getClientItems().add(new ClientItem(array.getJSONObject(i)));
                     }
 

@@ -23,7 +23,7 @@ public class Constants {
     public final static String URL_SERVER = "http://217.199.187.59/francoisle.fr/lacommande/";
 
     // Connecting
-    public final static String URL_LOGIN_CLUB = URL_SERVER + "apps-lacommande/v10/connectClub.php";
+    //public final static String URL_LOGIN_CLUB = URL_SERVER + "apps-lacommande/v10/connectClub.php";
 
     // Admin
     public final static String URL_CLUBS_LISTS = URL_SERVER + "apps-lacommande/v10/getClubList.php";
@@ -46,5 +46,22 @@ public class Constants {
 
     // Cart synchronization
     public final static String URL_CART_SYNC = URL_SERVER + "apps-lacommande/v10/syncOrder-token.php";
+
+    /**
+     * API Urls
+     */
+
+    // Base API URL
+    public final static String URL_API = "http://217.199.187.59/francoisle.fr/lacommande/api/desk/";
+
+    // Connect / login
+    public final static String API_CLUB_LOGIN = URL_API + "club/login.php";
+
+    /**
+     * Preferences
+     */
+    public final static String PREFS_IDENTIFIER = "fr.bde_eseo.lacommande.prefs";
+    public final static String PREFS_KEY_LOGIN = "key.login";
+
 
 }
