@@ -80,6 +80,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                tvProgress.setText("Préparation ... ");
                 progressConnect.setVisibility(View.VISIBLE);
                 Utilities.hideSoftKeyboard(LoginActivity.this);
 
