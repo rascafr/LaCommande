@@ -192,38 +192,6 @@ public class NewTab extends Fragment {
         }
     }
 
-    private class AsyncLoginOld extends AsyncTask<String, String, String> {
-
-        @Override
-        protected String doInBackground(String... url) {
-            return ConnexionUtils.postServerData(url[0], null);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected void onPostExecute(String data) {
-            super.onPostExecute(data);
-
-            if (Utilities.isNetworkDataValid(data)) {
-
-                try {
-                    JSONArray array = new JSONArray(data);
-                    for (int i=0;i<array.length();i++) {
-                        logins.add(array.getJSONObject(i).getString("fullname"));
-                    }
-                    Toast.makeText(getActivity(), logins.size() + " logins", Toast.LENGTH_SHORT).show();
-                    adapter.notifyDataSetChanged();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
     // Fill the autocomplete edittext with client's data
     private void fillEditTextData () {
         if (logins == null)

@@ -149,7 +149,7 @@ public class LoginActivity extends AppCompatActivity {
 
                             // Update client data
                             AsyncClients asyncClients = new AsyncClients();
-                            asyncClients.execute(Constants.URL_CLIENTS_LISTS);
+                            asyncClients.execute();
 
                         } catch (JSONException e) {
                             tvProgress.setText("Erreur serveur");
@@ -167,11 +167,11 @@ public class LoginActivity extends AppCompatActivity {
 
     // Custom task to download data about clients from server's database
     // (best moment to do it !)
-    private class AsyncClients extends AsyncTask<String, String, String> {
+    private class AsyncClients extends AsyncTask<String, String, APIResponse> {
 
         @Override
-        protected String doInBackground(String... url) {
-            return ConnexionUtils.postServerData(url[0], null);
+        protected APIResponse doInBackground(String... url) {
+            return APIUtils.postAPIData(Constants.API_CLIENT_LIST, null, context);
         }
 
         @Override
@@ -183,13 +183,12 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(String data) {
-            super.onPostExecute(data);
+        protected void onPostExecute(APIResponse apiResponse) {
 
             progressConnect.setVisibility(View.INVISIBLE);
             tvProgress.setVisibility(View.INVISIBLE);
 
-            if (Utilities.isNetworkDataValid(data)) {
+            if (apiResponse.isValid()) {
 
                 try {
 
@@ -197,7 +196,7 @@ public class LoginActivity extends AppCompatActivity {
                     DataStore.getInstance().initClientArray();
 
                     // Fill array with raw data (unsorted names)
-                    JSONArray array = new JSONArray(data);
+                    JSONArray array = apiResponse.getJsonData().getJSONArray("clients");
                     for (int i = 0; i < array.length(); i++) {
                         DataStore.getInstance().getClientItems().add(new ClientItem(array.getJSONObject(i)));
                     }
