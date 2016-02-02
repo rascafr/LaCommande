@@ -8,9 +8,9 @@ android:layout_height="wrap_content"
 card_view:cardElevation="4dp"
 card_view:cardCornerRadius="4dp"
 android:layout_marginTop="14dp"
-android:layout_marginLeft="8dp"
-android:layout_marginRight="8dp"
 android:layout_marginBottom="0dp"
+android:layout_marginLeft="64dp"
+android:layout_marginRight="64dp"
 android:clickable="true"
 android:foreground="?android:attr/selectableItemBackground"
 card_view:cardPreventCornerOverlap="false" >
@@ -21,20 +21,68 @@ card_view:cardPreventCornerOverlap="false" >
 
     <View
         android:layout_width="48dp"
-        android:layout_height="82dp"
+        android:layout_height="80dp"
         android:background="@drawable/rect_rounded"
         android:id="@+id/view" />
 
+    <LinearLayout
+        android:layout_width="164dp"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:id="@+id/ll1"
+        android:layout_toEndOf="@+id/view"
+        android:layout_marginStart="24dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/historyNumero"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:text="ADX 512" />
+
+        <TextView
+            android:id="@+id/historyClient"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:text="François Leparoux" />
+
+        <TextView
+            android:id="@+id/historyDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="12/12/2016" />
+
+    </LinearLayout>
+
     <TextView
-        android:id="@+id/historyTitle"
+        android:id="@+id/historyPrice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:text="ADX 512 - François Leparoux"
+        android:layout_marginLeft="24dp"
+        android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:layout_toEndOf="@+id/view"
-        android:layout_marginStart="18dp" />
+        android:layout_marginRight="24dp"
+        android:textStyle="bold"
+        android:text="25.1€" />
 
+    <TextView
+        android:id="@+id/historyData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="24dp"
+        android:layout_marginRight="24dp"
+        android:layout_centerVertical="true"
+        android:text="text text"
+        android:layout_toEndOf="@id/ll1"
+        android:layout_toStartOf="@id/historyPrice"
+        android:maxLines="3"
+        android:ellipsize="end"/>
 
 </RelativeLayout>
 

@@ -57,6 +57,9 @@ public class Constants {
     // Connect / login
     public final static String API_CLUB_LOGIN = URL_API + "club/login.php";
 
+    // History
+    public final static String API_ORDER_HISTORY = URL_API + "order/history.php";
+
     /**
      * Preferences
      */

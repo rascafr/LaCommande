@@ -73,7 +73,11 @@ public class LoginActivity extends AppCompatActivity {
         tvProgress = (TextView) findViewById(R.id.tvProgress);
 
         // Set view
-        etLogin.setText(prefs.getString(Constants.PREFS_KEY_LOGIN, ""));
+        String lastLogin = prefs.getString(Constants.PREFS_KEY_LOGIN, "");
+        if (lastLogin.length() > 0) {
+            etLogin.setText(lastLogin);
+            etPassword.requestFocus();
+        }
 
         // Listen for connexion intent
         bpConnect.setOnClickListener(new View.OnClickListener() {

@@ -64,6 +64,7 @@
     </array>
 
     <string name="share_using">Partager depuis ...</string>
+    <string name="history_pages">Page : </string>
 
     <!-- Random Strings for Password generation -->
     <string-array name="password_samples">

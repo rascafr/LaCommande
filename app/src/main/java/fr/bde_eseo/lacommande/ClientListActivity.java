@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -16,6 +17,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.melnykov.fab.FloatingActionButton;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,6 +41,7 @@ public class ClientListActivity extends AppCompatActivity {
     // UI Layout
     private ProgressBar progressClient;
     private RecyclerView recyList;
+    private FloatingActionButton fab;
 
     // Toolbar
     private EditText etSearch;
@@ -56,10 +60,14 @@ public class ClientListActivity extends AppCompatActivity {
         // Set UI Main Layout
         setContentView(R.layout.activity_clients);
 
+        // Arrow back to main activity
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         // Get objects
         progressClient = (ProgressBar) findViewById(R.id.progressClients);
         recyList = (RecyclerView) findViewById(R.id.recyList);
         progressClient.setVisibility(View.INVISIBLE);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
 
         // Init model
         displayItems = new ArrayList<>();
@@ -119,11 +127,10 @@ public class ClientListActivity extends AppCompatActivity {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyList.setLayoutManager(llm);
 
+        // Attach floating button
+        fab.attachToRecyclerView(recyList);
+
         // Download data from server
-        /*
-        AsyncLogin asyncLogin = new AsyncLogin();
-        asyncLogin.execute(Constants.URL_CLIENTS_LISTS);
-        */
         fillHeaderArray();
         mAdapter.notifyDataSetChanged();
 
@@ -267,4 +274,16 @@ public class ClientListActivity extends AppCompatActivity {
             }
         }
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                ClientListActivity.this.onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 }
