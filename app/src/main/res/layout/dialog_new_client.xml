@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp"
+        android:textColor="@color/dialog_text_warning"
+        android:text="Entrez ci-dessous le prénom PUIS le nom de la personne à ajouter.\nVérifiez bien qu'elle n'existe pas déjà dans la base de données.\nRespectez les espaces, tirets, accents, le plus fidèlement possible."/>
+
+    <EditText
+        android:id="@+id/etClientName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:ems="16"
+        android:hint="Prénom Nom"
+        android:singleLine="true"
+        android:maxLines="1"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp"
+        android:textColor="@color/dialog_text_warning"
+        android:text="Si le client connaît son login ESEO (étudiant ou prof), notez-le ci-dessous. Sinon, laissez le champ vide !"/>
+
+
+    <EditText
+        android:id="@+id/etClientLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="16"
+        android:layout_below="@id/etClubName"
+        android:hint="Login ESEO"
+        android:singleLine="true"
+        android:maxLines="1"/>
+
+</LinearLayout>

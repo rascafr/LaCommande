@@ -61,6 +61,7 @@ public class Constants {
     public final static String API_ORDER_HISTORY = URL_API + "order/history.php";
 
     // Clients
+    public final static String API_CLIENT_ADD = URL_API + "client/add.php";
     public final static String API_CLIENT_LIST = URL_API + "client/list.php";
 
     /**

@@ -1,5 +1,6 @@
 package fr.bde_eseo.lacommande;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -8,28 +9,36 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.melnykov.fab.FloatingActionButton;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Locale;
 
 import fr.bde_eseo.lacommande.model.ClientItem;
 import fr.bde_eseo.lacommande.model.DataStore;
+import fr.bde_eseo.lacommande.utils.APIResponse;
+import fr.bde_eseo.lacommande.utils.APIUtils;
 import fr.bde_eseo.lacommande.utils.ConnexionUtils;
 import fr.bde_eseo.lacommande.utils.Utilities;
 
@@ -53,9 +62,16 @@ public class ClientListActivity extends AppCompatActivity {
     // Model
     private ArrayList<ClientItem> displayItems;
 
+    // Android
+    private Context context;
+
+    // Local dialog for client add
+    private MaterialDialog newClientDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        context = ClientListActivity.this;
 
         // Set UI Main Layout
         setContentView(R.layout.activity_clients);
@@ -130,6 +146,40 @@ public class ClientListActivity extends AppCompatActivity {
         // Attach floating button
         fab.attachToRecyclerView(recyList);
 
+        // New client listener
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                newClientDialog = new MaterialDialog.Builder(context)
+                        .title("Ajouter un nouveau client")
+                        .customView(R.layout.dialog_new_client, true)
+                        .positiveText("Créer")
+                        .negativeText("Annuler")
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
+                                View view = materialDialog.getCustomView();
+                                EditText etName = (EditText) view.findViewById(R.id.etClientName);
+                                EditText etLogin = (EditText) view.findViewById(R.id.etClientLogin);
+                                AsyncAddClient asyncAddClient = new AsyncAddClient(
+                                        etName.getText().toString(),
+                                        etLogin.getText().toString()
+                                );
+                                asyncAddClient.execute();
+                            }
+                        })
+                        .onNegative(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
+                                materialDialog.hide();
+                            }
+                        })
+                        .cancelable(false)
+                        .autoDismiss(false)
+                        .show();
+            }
+        });
+
         // Download data from server
         fillHeaderArray();
         mAdapter.notifyDataSetChanged();
@@ -157,7 +207,7 @@ public class ClientListActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
-            ClientItem ci = displayItems.get(position);
+            final ClientItem ci = displayItems.get(position);
 
             switch (getItemViewType(position)) {
 
@@ -171,6 +221,25 @@ public class ClientListActivity extends AppCompatActivity {
                     } else {
                         civh.vDivier.setVisibility(View.GONE);
                     }
+
+                    // On click → dialog
+                    civh.llClient.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            new MaterialDialog.Builder(context)
+                                    .title("Action client")
+                                    .content("Que souhaitez vous faire pour " + ci.getFullname() + " ?")
+                                    .positiveText("Passer commande")
+                                    .negativeText("Annuler")
+                                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                        @Override
+                                        public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
+
+                                        }
+                                    })
+                                    .show();
+                        }
+                    });
 
                     break;
 
@@ -199,11 +268,13 @@ public class ClientListActivity extends AppCompatActivity {
 
             protected TextView vLogin, vName;
             protected View vDivier;
+            protected LinearLayout llClient;
 
             public ClientItemViewHolder(View v) {
                 super(v);
                 vLogin = (TextView) v.findViewById(R.id.clientLogin);
                 vName = (TextView) v.findViewById(R.id.clientName);
+                llClient = (LinearLayout) v.findViewById(R.id.llClient);
                 vDivier = v.findViewById(R.id.divider);
             }
         }
@@ -246,20 +317,6 @@ public class ClientListActivity extends AppCompatActivity {
             displayItems.add(ci);
             cnt++;
         }
-
-        /*
-        for (int i=0;i<size;i++) {
-            ClientItem ci = DataStore.getInstance().getClientItems().get(i);
-            if (bLetter || !ci.getName().startsWith(sLetter)) {
-                if (i > 0) {
-                    displayItems.get(i - 1).setShowDivider(false);
-                }
-                sLetter = ci.getName().charAt(0) + "";
-                displayItems.add(i, new ClientItem(sLetter));
-                cnt++;
-                bLetter = false;
-            }
-        }*/
     }
 
     // Restrict data in array (search mode)
@@ -284,6 +341,86 @@ public class ClientListActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+    // Asynctask to insert client into database
+    private class AsyncAddClient extends AsyncTask<String,String,APIResponse> {
+
+        private String name, login;
+        private MaterialDialog progressDialog;
+
+        public AsyncAddClient(String name, String login) {
+            try {
+                this.name = Base64.encodeToString(name.getBytes("UTF-8"), Base64.NO_WRAP);
+                this.login = Base64.encodeToString(login.getBytes("UTF-8"), Base64.NO_WRAP);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog = new MaterialDialog.Builder(context)
+                    .title("Veuillez patienter")
+                    .content("L'opération est en cours ...")
+                    .progress(true, 0)
+                    .progressIndeterminateStyle(false)
+                    .cancelable(false)
+                    .show();
+        }
+
+        @Override
+        protected void onPostExecute(APIResponse apiResponse) {
+
+            progressDialog.hide();
+
+            if (apiResponse.isValid()) {
+                if (newClientDialog != null) newClientDialog.hide();
+                try {
+
+                    // On récupère le nom / login du client ajouté pour ensuite modifier le dataset (plus écolo que de tout recharger)
+                    String insertedLogin = apiResponse.getJsonData().getString("inserted_login");
+                    String insertedName = apiResponse.getJsonData().getString("inserted_name");
+
+                    // Dialogue de confirmation
+                    progressDialog = new MaterialDialog.Builder(context)
+                            .title("Client ajouté !")
+                            .content("Le client " + insertedName + " a été ajouté avec le login \"" + insertedLogin + "\"\nQue souhaitez-vous faire maintenant ?")
+                            .positiveText("Passer commande")
+                            .negativeText("Fermer")
+                            .show();
+
+                    // Modification du dataset général
+                    DataStore.getInstance().getClientItems().add(new ClientItem(insertedLogin, insertedName));
+                    DataStore.getInstance().sortClientArray();
+
+                    // Rechargement du dataset d'affichage
+                    fillHeaderArray();
+                    mAdapter.notifyDataSetChanged();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                new MaterialDialog.Builder(context)
+                        .title("Erreur")
+                        .content(apiResponse.getError())
+                        .cancelable(false)
+                        .negativeText("Fermer")
+                        .show();
+            }
+        }
+
+        @Override
+        protected APIResponse doInBackground(String... params) {
+            HashMap<String,String> pairs = new HashMap<>();
+            pairs.put("login", DataStore.getInstance().getClubMember().getLogin());
+            pairs.put("password", DataStore.getInstance().getClubMember().getPassword());
+            pairs.put("base64name", name);
+            pairs.put("base64login", login);
+            return APIUtils.postAPIData(Constants.API_CLIENT_ADD, pairs, context);
+        }
     }
 
 }

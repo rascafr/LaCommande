@@ -202,12 +202,7 @@ public class LoginActivity extends AppCompatActivity {
                     }
 
                     // Sort data by names
-                    Collections.sort(DataStore.getInstance().getClientItems(), new Comparator<ClientItem>() {
-                        @Override
-                        public int compare(ClientItem lhs, ClientItem rhs) {
-                            return lhs.getName().compareToIgnoreCase(rhs.getName());
-                        }
-                    });
+                    DataStore.getInstance().sortClientArray();
 
                     // Finish connexion
                     Toast.makeText(LoginActivity.this, "Bienvenue, " +

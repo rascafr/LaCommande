@@ -5,6 +5,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Created by Rascafr on 24/10/2015.
@@ -59,6 +61,16 @@ public class DataStore {
             }
         }
         return clientItem;
+    }
+
+    // Sort clients
+    public void sortClientArray () {
+        Collections.sort(clientItems, new Comparator<ClientItem>() {
+            @Override
+            public int compare(ClientItem lhs, ClientItem rhs) {
+                return lhs.getName().compareToIgnoreCase(rhs.getName());
+            }
+        });
     }
 
     /**

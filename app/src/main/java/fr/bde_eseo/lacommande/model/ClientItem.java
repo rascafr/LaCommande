@@ -16,6 +16,8 @@ public class ClientItem {
     public ClientItem(String login, String fullname) {
         this.login = login;
         this.fullname = fullname;
+        this.showDivider = true;
+        presentByFamilyName();
     }
 
     public ClientItem (String name) {
