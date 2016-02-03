@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
         new MaterialDialog.Builder(this)
                 .title("Quitter")
-                .content("Vous allez être déconnecté.\nContinuer ?")
+                .content("Vous allez être déconnecté.\nN'oubliez pas de fermer la cafet depuis le menu \"Fermeture\" si c'est la fin de votre service.\n\nContinuer ?")
                 .positiveText("Déconnexion")
                 .negativeText("Annuler")
                 .callback(new MaterialDialog.ButtonCallback() {

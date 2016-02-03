@@ -12,7 +12,7 @@
         <item>Liste</item>
         <item>Historique</item>
         <item>Impayés</item>
-        <item>Déconnexion</item>
+        <item>Fermeture</item>
     </array>
 
     <array name="tabs_names_admin">
@@ -21,7 +21,7 @@
         <item>Liste</item>
         <item>Historique</item>
         <item>Impayés</item>
-        <item>Déconnexion</item>
+        <item>Fermeture</item>
     </array>
 
     <!-- Login Activity Strings -->
