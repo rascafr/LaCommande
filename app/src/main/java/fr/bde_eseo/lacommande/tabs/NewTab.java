@@ -31,8 +31,11 @@ import fr.bde_eseo.lacommande.ClientListActivity;
 import fr.bde_eseo.lacommande.Constants;
 import fr.bde_eseo.lacommande.OrderGenericActivity;
 import fr.bde_eseo.lacommande.R;
+import fr.bde_eseo.lacommande.async.AsyncToken;
 import fr.bde_eseo.lacommande.model.ClientItem;
 import fr.bde_eseo.lacommande.model.DataStore;
+import fr.bde_eseo.lacommande.utils.APIResponse;
+import fr.bde_eseo.lacommande.utils.APIUtils;
 import fr.bde_eseo.lacommande.utils.ConnexionUtils;
 import fr.bde_eseo.lacommande.utils.EncryptUtils;
 import fr.bde_eseo.lacommande.utils.Utilities;
@@ -75,13 +78,14 @@ public class NewTab extends Fragment {
                             public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
                                 String clientName = autoCompleteTextView.getText().toString();
                                 AsyncToken asyncToken = new AsyncToken(
+                                        getActivity(),
                                         DataStore.getInstance().getClubMember().getLogin(),
                                         DataStore.getInstance().getClubMember().getPassword(),
                                         DataStore.getInstance().searchForClient(clientName).getLogin(),
                                         BuildConfig.VERSION_NAME,
                                         clientName
                                 );
-                                asyncToken.execute(Constants.URL_TOKEN_GET);
+                                asyncToken.execute();
                             }
                         })
                         .cancelable(true);
@@ -105,92 +109,6 @@ public class NewTab extends Fragment {
         return rootView;
     }
 
-    private class AsyncToken extends AsyncTask<String, String, String> {
-
-        private String loginClub, passwordClub, loginClient, version, clientName;
-        private MaterialDialog materialDialog;
-
-        public AsyncToken(String loginClub, String passwordClub, String loginClient, String version, String clientName) {
-            this.loginClub = loginClub;
-            this.passwordClub = passwordClub;
-            this.loginClient = loginClient;
-            this.version = version;
-            this.clientName = clientName;
-        }
-
-        @Override
-        protected String doInBackground(String... url) {
-            HashMap<String, String> pairs = new HashMap<>();
-            String hash = EncryptUtils.sha256(
-                    getString(R.string.salt_get_token) +
-                            loginClub +
-                            passwordClub +
-                            loginClient +
-                            version
-            );
-            pairs.put("loginClub", loginClub);
-            pairs.put("passwordClub", passwordClub);
-            pairs.put("loginClient", loginClient);
-            pairs.put("version", version);
-            pairs.put("hash", hash);
-
-            return ConnexionUtils.postServerData(url[0], pairs);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            materialDialog = new MaterialDialog.Builder(getActivity())
-                    .title("Préparation")
-                    .content("Veuillez patienter ...")
-                    .cancelable(false)
-                    .progress(true, 4)
-                    .progressIndeterminateStyle(false)
-                    .show();
-        }
-
-        @Override
-        protected void onPostExecute(final String data) {
-            super.onPostExecute(data);
-
-            // Wait a little
-            new Handler().postDelayed(
-                    new Runnable() {
-
-                        @Override
-                        public void run() {
-
-                            materialDialog.hide();
-
-                            if (Utilities.isNetworkDataValid(data)) {
-                                try {
-                                    JSONObject obj = new JSONObject(data);
-
-                                    if (obj.getInt("result") == 1) {
-                                        DataStore.getInstance().setToken(obj.getString("token"));
-                                        Intent i = new Intent(getActivity(), OrderGenericActivity.class);
-                                        i.putExtra(Constants.KEY_NEW_ORDER_CLIENT, clientName);
-                                        getActivity().startActivity(i);
-                                    } else {
-                                        materialDialog = new MaterialDialog.Builder(getActivity())
-                                                .title("Erreur")
-                                                .content(obj.getString("cause"))
-                                                .cancelable(false)
-                                                .negativeText("Fermer")
-                                                .show();
-                                    }
-
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                    Toast.makeText(getActivity(), "Erreur serveur", Toast.LENGTH_SHORT).show();
-                                }
-                            } else {
-                                Toast.makeText(getActivity(), "Erreur réseau", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    }, 1500);
-        }
-    }
 
     // Fill the autocomplete edittext with client's data
     private void fillEditTextData () {

@@ -35,6 +35,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Locale;
 
+import fr.bde_eseo.lacommande.async.AsyncToken;
 import fr.bde_eseo.lacommande.model.ClientItem;
 import fr.bde_eseo.lacommande.model.DataStore;
 import fr.bde_eseo.lacommande.utils.APIResponse;
@@ -205,7 +206,7 @@ public class ClientListActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
 
             final ClientItem ci = displayItems.get(position);
 
@@ -234,7 +235,15 @@ public class ClientListActivity extends AppCompatActivity {
                                     .onPositive(new MaterialDialog.SingleButtonCallback() {
                                         @Override
                                         public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
-
+                                            AsyncToken asyncToken = new AsyncToken(
+                                                    context,
+                                                    DataStore.getInstance().getClubMember().getLogin(),
+                                                    DataStore.getInstance().getClubMember().getPassword(),
+                                                    displayItems.get(position).getLogin(),
+                                                    BuildConfig.VERSION_NAME,
+                                                    displayItems.get(position).getFullname()
+                                            );
+                                            asyncToken.execute();
                                         }
                                     })
                                     .show();
@@ -380,8 +389,8 @@ public class ClientListActivity extends AppCompatActivity {
                 try {
 
                     // On récupère le nom / login du client ajouté pour ensuite modifier le dataset (plus écolo que de tout recharger)
-                    String insertedLogin = apiResponse.getJsonData().getString("inserted_login");
-                    String insertedName = apiResponse.getJsonData().getString("inserted_name");
+                    final String insertedLogin = apiResponse.getJsonData().getString("inserted_login");
+                    final String insertedName = apiResponse.getJsonData().getString("inserted_name");
 
                     // Dialogue de confirmation
                     progressDialog = new MaterialDialog.Builder(context)
@@ -389,6 +398,20 @@ public class ClientListActivity extends AppCompatActivity {
                             .content("Le client " + insertedName + " a été ajouté avec le login \"" + insertedLogin + "\"\nQue souhaitez-vous faire maintenant ?")
                             .positiveText("Passer commande")
                             .negativeText("Fermer")
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
+                                    AsyncToken asyncToken = new AsyncToken(
+                                            context,
+                                            DataStore.getInstance().getClubMember().getLogin(),
+                                            DataStore.getInstance().getClubMember().getPassword(),
+                                            insertedLogin,
+                                            BuildConfig.VERSION_NAME,
+                                            insertedName
+                                    );
+                                    asyncToken.execute();
+                                }
+                            })
                             .show();
 
                     // Modification du dataset général

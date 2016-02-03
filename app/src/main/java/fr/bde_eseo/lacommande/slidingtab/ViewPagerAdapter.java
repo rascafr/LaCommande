@@ -8,7 +8,6 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import fr.bde_eseo.lacommande.tabs.AdminTab;
 import fr.bde_eseo.lacommande.tabs.EmptyTab;
 import fr.bde_eseo.lacommande.tabs.HistoryTab;
-import fr.bde_eseo.lacommande.tabs.NewOrderTab;
 import fr.bde_eseo.lacommande.tabs.NewTab;
 import fr.bde_eseo.lacommande.tabs.OrdersTab;
 

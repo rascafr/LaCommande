@@ -31,18 +31,12 @@ public class Constants {
     public final static String URL_PLANNING_GET = URL_SERVER + "apps-lacommande/v10/getPlanning.php";
     public final static String URL_PLANNING_SYNC = URL_SERVER + "apps-lacommande/v10/syncPlanning.php";
 
-    // New Client / Client managing
-    public final static String URL_CLIENTS_LISTS = URL_SERVER + "apps-lacommande/v10/getClientsList.php";
-
     // Orders List
     public final static String URL_CURRENT_ORDERS_GET = URL_SERVER + "apps-lacommande/v10/getCurrentOrders.php";
     public final static String URL_CURRENT_ORDER_SYNC = URL_SERVER + "apps-lacommande/v10/syncCurrentOrder.php";
 
     // Cafeteria Data
     public final static String URL_DATA_GET = URL_SERVER + "apps-lacommande/v10/syncData.php";
-
-    // Token recuperation
-    public final static String URL_TOKEN_GET = URL_SERVER + "apps-lacommande/v10/syncDate-token.php";
 
     // Cart synchronization
     public final static String URL_CART_SYNC = URL_SERVER + "apps-lacommande/v10/syncOrder-token.php";
@@ -63,6 +57,9 @@ public class Constants {
     // Clients
     public final static String API_CLIENT_ADD = URL_API + "client/add.php";
     public final static String API_CLIENT_LIST = URL_API + "client/list.php";
+
+    // Order
+    public final static String API_ORDER_PREPARE = URL_API + "order/prepare.php";
 
     /**
      * Preferences
