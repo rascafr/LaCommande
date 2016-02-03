@@ -633,15 +633,29 @@ public class OrderGenericActivity extends AppCompatActivity {
                 // Copy the element
                 MenuItem menuItem = new MenuItem((MenuItem) linkItem);
 
-                // Primary Element chooser mode first
-                currentMode = MODE_ELEMENTS_PRIMARY;
-
                 // Count elements
                 int nbElemActual = menuItem.getItems().size() + 1;
-                int nbElemMax = menuItem.getNbSandw();
+                int nbSandwMax = menuItem.getNbSandw();
+                int nbElemMax = menuItem.getNbElems();
 
-                // Set helper text
-                setHelperText("Choisissez l'élément principal " + nbElemActual + "/" + nbElemMax + " du menu " + menuItem.getName());
+                // If no main element : switch to secondary element
+                if (nbSandwMax == 0) {
+
+                    // Set helper text
+                    setHelperText("Choisissez l'élément secondaire " + nbElemActual + "/" + nbElemMax + " du menu " + menuItem.getName());
+
+                    // Secondary Element chooser mode only
+                    currentMode = MODE_ELEMENTS_SECONDARY;
+
+                } else {
+                    // else switch to main element
+
+                    // Set helper text
+                    setHelperText("Choisissez l'élément principal " + nbElemActual + "/" + nbSandwMax + " du menu " + menuItem.getName());
+
+                    // Primary Element chooser mode first
+                    currentMode = MODE_ELEMENTS_PRIMARY;
+                }
 
                 // Add current element into cart and set text in yellow
                 DataStore.getInstance().getCartItems().add(menuItem);
@@ -688,9 +702,24 @@ public class OrderGenericActivity extends AppCompatActivity {
 
                 } else {
 
-                    // If a menu is selected, add element into
+                    // If a menu is selected, add element into if it's less than max
                     if (selectedMenu != null) {
+
                         selectedMenu.addItem(elementItem);
+
+                        if (selectedMenu.getItems().size() < ((MenuItem)selectedMenu).getNbElems()) {
+                            // Set helper text
+                            setHelperText("Choisissez l'élément secondaire " + (selectedMenu.getItems().size() + 1) + "/" + ((MenuItem) selectedMenu).getNbElems() + " du menu " + selectedMenu.getName());
+                        } else {
+                            // End selection
+                            selectedMenu = null;
+                            // Helper default
+                            setHelperText("Sélectionnez une catégorie, puis ajoutez un menu ou un élément");
+                            // Navigation mode
+                            currentMode = MODE_NAVIGATE;
+                            // Reset display
+                            updateDisplayArray(0);
+                        }
                     } else {
                         // Else, add it directly to cart
                         DataStore.getInstance().getCartItems().add(elementItem);
