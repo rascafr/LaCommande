@@ -167,8 +167,8 @@ public class OrderGenericActivity extends AppCompatActivity {
         displayAdapter.notifyDataSetChanged();
 
         // Download data from server
-        final AsyncData asyncData = new AsyncData();
-        asyncData.execute(Constants.URL_DATA_GET);
+        AsyncData asyncData = new AsyncData();
+        asyncData.execute(Constants.API_ORDER_ITEMS);
 
         // Buttons on-clic listener
         buttonValid.setOnClickListener(new View.OnClickListener() {
@@ -625,106 +625,110 @@ public class OrderGenericActivity extends AppCompatActivity {
     // Decide about what a display item touch does
     void actionDisplayTouch (DisplayItem displayItem, RootItem linkItem) {
 
-        // It's a menu ?
-        if (linkItem.getType().equals(MenuItem.TYPE)) {
+        switch (linkItem.getType()) {
 
-            // Copy the element
-            MenuItem menuItem = new MenuItem((MenuItem) linkItem);
+            // It's a menu ?
+            case MenuItem.TYPE:
 
-            // Primary Element chooser mode first
-            currentMode = MODE_ELEMENTS_PRIMARY;
+                // Copy the element
+                MenuItem menuItem = new MenuItem((MenuItem) linkItem);
 
-            // Count elements
-            int nbElemActual = menuItem.getItems().size() + 1;
-            int nbElemMax = menuItem.getNbSandw();
+                // Primary Element chooser mode first
+                currentMode = MODE_ELEMENTS_PRIMARY;
 
-            // Set helper text
-            setHelperText("Choisissez l'élément principal " + nbElemActual + "/" + nbElemMax + " du menu " + menuItem.getName());
-
-            // Add current element into cart and set text in yellow
-            DataStore.getInstance().getCartItems().add(menuItem);
-            updateCartArray();
-
-            // Memorize menu item
-            selectedMenu = menuItem;
-
-            // Display primary elements
-            updateDisplayArray(0);
-        }
-
-        // It's an element ?
-        else if (linkItem.getType().equals(ElementItem.TYPE)) {
-
-            // Copy the element
-            ElementItem elementItem = new ElementItem((ElementItem) linkItem);
-
-            // Element has ingredients ?
-            if (elementItem.getIngredients() > 0) {
-
-                // Ingredient chooser mode
-                currentMode = MODE_INGREDIENTS;
+                // Count elements
+                int nbElemActual = menuItem.getItems().size() + 1;
+                int nbElemMax = menuItem.getNbSandw();
 
                 // Set helper text
-                setHelperText("Ajoutez les ingredients pour l'élément " + elementItem.getName() + " (" + elementItem.getIngredients() + " max)");
+                setHelperText("Choisissez l'élément principal " + nbElemActual + "/" + nbElemMax + " du menu " + menuItem.getName());
 
-                // If a menu is selected, add element into
-                if (selectedMenu != null) {
-                    selectedMenu.addItem(elementItem);
-                } else {
-                    // Else, add it directly to cart
-                    DataStore.getInstance().getCartItems().add(elementItem);
-                }
-
-                // Memorize element item
-                selectedElement = elementItem;
-
-                // Update cart array
+                // Add current element into cart and set text in yellow
+                DataStore.getInstance().getCartItems().add(menuItem);
                 updateCartArray();
 
-                // Display ingredients
+                // Memorize menu item
+                selectedMenu = menuItem;
+
+                // Display primary elements
                 updateDisplayArray(0);
+                break;
 
-            } else {
+            // It's an element ?
+            case ElementItem.TYPE:
 
-                // If a menu is selected, add element into
-                if (selectedMenu != null) {
-                    selectedMenu.addItem(elementItem);
+                // Copy the element
+                ElementItem elementItem = new ElementItem((ElementItem) linkItem);
+
+                // Element has ingredients ?
+                if (elementItem.getIngredients() > 0) {
+
+                    // Ingredient chooser mode
+                    currentMode = MODE_INGREDIENTS;
+
+                    // Set helper text
+                    setHelperText("Ajoutez les ingredients pour l'élément " + elementItem.getName() + " (" + elementItem.getIngredients() + " max)");
+
+                    // If a menu is selected, add element into
+                    if (selectedMenu != null) {
+                        selectedMenu.addItem(elementItem);
+                    } else {
+                        // Else, add it directly to cart
+                        DataStore.getInstance().getCartItems().add(elementItem);
+                    }
+
+                    // Memorize element item
+                    selectedElement = elementItem;
+
+                    // Update cart array
+                    updateCartArray();
+
+                    // Display ingredients
+                    updateDisplayArray(0);
+
                 } else {
-                    // Else, add it directly to cart
-                    DataStore.getInstance().getCartItems().add(elementItem);
+
+                    // If a menu is selected, add element into
+                    if (selectedMenu != null) {
+                        selectedMenu.addItem(elementItem);
+                    } else {
+                        // Else, add it directly to cart
+                        DataStore.getInstance().getCartItems().add(elementItem);
+                    }
+
+                    // Add it to cart (no customisation)
+                    updateCartArray();
                 }
 
-                // Add it to cart (no customisation)
-                updateCartArray();
-            }
+                break;
 
-        }
-        // It's an ingredient ?
-        else if (linkItem.getType().equals(IngredientItem.TYPE)) {
+            // It's an ingredient ?
+            case IngredientItem.TYPE:
 
-            if (displayItem.isSelected()) {
+                if (displayItem.isSelected()) {
 
-                selectedElement.getItems().remove(
-                        searchForElement(selectedElement, displayItem.getLinkItem().getId())
-                );
-                displayItem.setIsSelected(false);
-                displayAdapter.notifyDataSetChanged();
-                updateCartArray();
+                    selectedElement.getItems().remove(
+                            searchForElement(selectedElement, displayItem.getLinkItem().getId())
+                    );
+                    displayItem.setIsSelected(false);
+                    displayAdapter.notifyDataSetChanged();
+                    updateCartArray();
 
-            } else {
+                } else {
 
-                // Copy the ingredient object
-                IngredientItem ingredientItem = (IngredientItem) linkItem;
+                    // Copy the ingredient object
+                    IngredientItem ingredientItem = (IngredientItem) linkItem;
 
-                // Mark the display item as selected
-                displayItem.setIsSelected(true);
-                displayAdapter.notifyDataSetChanged();
+                    // Mark the display item as selected
+                    displayItem.setIsSelected(true);
+                    displayAdapter.notifyDataSetChanged();
 
-                // Add the ingredient into element
-                selectedElement.addItem(ingredientItem);
+                    // Add the ingredient into element
+                    selectedElement.addItem(ingredientItem);
 
-                updateCartArray();
-            }
+                    updateCartArray();
+                }
+                break;
         }
     }
 
