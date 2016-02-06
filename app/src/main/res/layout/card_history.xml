@@ -22,7 +22,7 @@ card_view:cardPreventCornerOverlap="false" >
     <View
         android:layout_width="48dp"
         android:layout_height="80dp"
-        android:background="@drawable/rect_rounded"
+        android:background="@drawable/rect_rounded_history"
         android:id="@+id/view" />
 
     <LinearLayout
