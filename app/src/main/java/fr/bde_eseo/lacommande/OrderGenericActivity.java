@@ -180,60 +180,70 @@ public class OrderGenericActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                switch (currentMode) {
+                // Check cart is not empty
+                if (cartItems.size() == 0) {
+                    new MaterialDialog.Builder(context)
+                            .title("Panier vide")
+                            .content("Vous devez ajouter au moins un élément pour envoyer la commande en cuisine.")
+                            .negativeText("Fermer")
+                            .show();
+                } else {
 
-                    // If mode is Ingredient, end it
-                    case MODE_INGREDIENTS:
-                        currentMode = MODE_ELEMENTS_PRIMARY;
-                        break;
+                    switch (currentMode) {
 
-                    // If mode is Primary, end it
-                    case MODE_ELEMENTS_PRIMARY:
-                        currentMode = MODE_NAVIGATE;
-                        break;
+                        // If mode is Ingredient, end it
+                        case MODE_INGREDIENTS:
+                            currentMode = MODE_ELEMENTS_PRIMARY;
+                            break;
 
-                    // If mode is Navigate, send order to cookers
-                    case MODE_NAVIGATE:
+                        // If mode is Primary, end it
+                        case MODE_ELEMENTS_PRIMARY:
+                            currentMode = MODE_NAVIGATE;
+                            break;
 
-                        MaterialDialog md = new MaterialDialog.Builder(OrderGenericActivity.this)
-                                .customView(R.layout.dialog_add_instructions, false)
-                                .title("Ajouter un commentaire ?")
-                                .positiveText("Finaliser la commande")
-                                .negativeText("Annuler")
-                                .cancelable(false)
-                                .positiveText("Confirmer")
-                                .negativeText("Annuler")
-                                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                    @Override
-                                    public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
-                                        DataStore.getInstance().setInstructions(
-                                                // Convert InputText into formatted string without Emojis / Unicode characters
-                                                etInstr
-                                                        .getText()
-                                                        .toString()
-                                                        .trim()
-                                        );
-                                        AsyncPostCart asyncPostCart = new AsyncPostCart();
-                                        asyncPostCart.execute();
+                        // If mode is Navigate, send order to cookers
+                        case MODE_NAVIGATE:
 
-                                    }
-                                })
-                                .onNegative(new MaterialDialog.SingleButtonCallback() {
-                                    @Override
-                                    public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
-                                        materialDialog.hide();
-                                    }
-                                })
-                                .build();
+                            MaterialDialog md = new MaterialDialog.Builder(OrderGenericActivity.this)
+                                    .customView(R.layout.dialog_add_instructions, false)
+                                    .title("Ajouter un commentaire ?")
+                                    .positiveText("Finaliser la commande")
+                                    .negativeText("Annuler")
+                                    .cancelable(false)
+                                    .positiveText("Confirmer")
+                                    .negativeText("Annuler")
+                                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                        @Override
+                                        public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
+                                            DataStore.getInstance().setInstructions(
+                                                    // Convert InputText into formatted string without Emojis / Unicode characters
+                                                    etInstr
+                                                            .getText()
+                                                            .toString()
+                                                            .trim()
+                                            );
+                                            AsyncPostCart asyncPostCart = new AsyncPostCart();
+                                            asyncPostCart.execute();
 
-                        etInstr = ((EditText) (md.getView().findViewById(R.id.etInstructions)));
-                        md.show();
+                                        }
+                                    })
+                                    .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                        @Override
+                                        public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
+                                            materialDialog.hide();
+                                        }
+                                    })
+                                    .build();
 
-                        break;
+                            etInstr = ((EditText) (md.getView().findViewById(R.id.etInstructions)));
+                            md.show();
+
+                            break;
+                    }
+
+                    updateButtonProperties();
+                    updateDisplayArray(0);
                 }
-
-                updateButtonProperties();
-                updateDisplayArray(0);
             }
         });
     }

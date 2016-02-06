@@ -261,6 +261,10 @@ public class HistoryTab extends Fragment {
                         orderItems.add(new OrderItem(array.getJSONObject(i)));
                     }
 
+                    // Set to 0
+                    if (orderItems.size() > 0)
+                        recyList.scrollToPosition(0);
+
                     // Current page
                     nbPages = apiResponse.getJsonData().getInt("pages") - 1; // cause 0 = page n°1
                     tvPage.setText((currentPage+1) + " / " + (nbPages+1));
