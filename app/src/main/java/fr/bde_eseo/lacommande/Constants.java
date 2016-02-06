@@ -61,12 +61,14 @@ public class Constants {
     // Order
     public final static String API_ORDER_PREPARE = URL_API + "order/prepare.php";
     public final static String API_ORDER_ITEMS = URL_API + "order/items.php";
+    public final static String API_ORDER_SEND = URL_API + "order/send.php";
 
     /**
      * Preferences
      */
     public final static String PREFS_IDENTIFIER = "fr.bde_eseo.lacommande.prefs";
     public final static String PREFS_KEY_LOGIN = "key.login";
+    public final static String PREFS_KEY_PASSWORD = "key.password";
 
 
 }

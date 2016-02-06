@@ -1,5 +1,6 @@
 package fr.bde_eseo.lacommande;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -36,6 +37,8 @@ import fr.bde_eseo.lacommande.model.ElementItem;
 import fr.bde_eseo.lacommande.model.IngredientItem;
 import fr.bde_eseo.lacommande.model.MenuItem;
 import fr.bde_eseo.lacommande.model.RootItem;
+import fr.bde_eseo.lacommande.utils.APIResponse;
+import fr.bde_eseo.lacommande.utils.APIUtils;
 import fr.bde_eseo.lacommande.utils.ConnexionUtils;
 import fr.bde_eseo.lacommande.utils.Utilities;
 
@@ -70,6 +73,7 @@ public class OrderGenericActivity extends AppCompatActivity {
     private int selectedItem = 0;
     private int currentMode = MODE_NAVIGATE;
     private String clientName;
+    private Context context;
 
     // Current object
     private RootItem selectedMenu;
@@ -84,6 +88,7 @@ public class OrderGenericActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        context = OrderGenericActivity.this;
 
         // Set UI Main Layout
         setContentView(R.layout.activity_generic_order);
@@ -91,7 +96,7 @@ public class OrderGenericActivity extends AppCompatActivity {
         // Get intent's parameters
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
-            if(extras == null) {
+            if (extras == null) {
                 Toast.makeText(OrderGenericActivity.this, "Erreur de l'application (c'est pas normal)", Toast.LENGTH_SHORT).show();
                 finish();
             } else {
@@ -209,7 +214,7 @@ public class OrderGenericActivity extends AppCompatActivity {
                                                         .trim()
                                         );
                                         AsyncPostCart asyncPostCart = new AsyncPostCart();
-                                        asyncPostCart.execute(Constants.URL_CART_SYNC);
+                                        asyncPostCart.execute();
 
                                     }
                                 })
@@ -221,7 +226,7 @@ public class OrderGenericActivity extends AppCompatActivity {
                                 })
                                 .build();
 
-                        etInstr = ((EditText)(md.getView().findViewById(R.id.etInstructions)));
+                        etInstr = ((EditText) (md.getView().findViewById(R.id.etInstructions)));
                         md.show();
 
                         break;
@@ -419,7 +424,7 @@ public class OrderGenericActivity extends AppCompatActivity {
         }
     }
 
-    private class AsyncData extends AsyncTask<String,String,String> {
+    private class AsyncData extends AsyncTask<String, String, String> {
 
         @Override
         protected String doInBackground(String... urls) {
@@ -444,14 +449,14 @@ public class OrderGenericActivity extends AppCompatActivity {
         }
     }
 
-    private class AsyncPostCart extends AsyncTask<String, String, String> {
+    private class AsyncPostCart extends AsyncTask<String, String, APIResponse> {
 
         private MaterialDialog materialDialog;
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            materialDialog = new MaterialDialog.Builder(OrderGenericActivity.this)
+            materialDialog = new MaterialDialog.Builder(context)
                     .title("Envoi de la commande")
                     .content("Veuillez patientier ...")
                     .cancelable(false)
@@ -461,69 +466,62 @@ public class OrderGenericActivity extends AppCompatActivity {
         }
 
         @Override
-        protected String doInBackground(String... params) {
+        protected APIResponse doInBackground(String... params) {
 
             String JSONstr = DataStore.getInstance().outputJSON();
             String instr = DataStore.getInstance().getInstructions();
-            String resp = null;
 
+            HashMap<String, String> pairs = new HashMap<>();
             try {
-                HashMap<String, String> pairs = new HashMap<>();
                 pairs.put("token", DataStore.getInstance().getToken());
                 pairs.put("data", Base64.encodeToString(JSONstr.getBytes("UTF-8"), Base64.NO_WRAP));
                 pairs.put("instructions", Base64.encodeToString(instr.getBytes("UTF-8"), Base64.NO_WRAP));
-                resp = ConnexionUtils.postServerData(params[0], pairs);
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
 
-            return resp;
+            return APIUtils.postAPIData(Constants.API_ORDER_SEND, pairs, context);
         }
 
         @Override
-        protected void onPostExecute(String data) {
-            super.onPostExecute(data);
+        protected void onPostExecute(APIResponse apiResponse) {
 
             materialDialog.hide();
 
-            if (Utilities.isNetworkDataValid(data)) {
-                try {
-                    JSONObject obj = new JSONObject(data);
-                    if (obj.getInt("result") == 1) {
-                        materialDialog = new MaterialDialog.Builder(OrderGenericActivity.this)
-                                .title("Commande envoyée !")
-                                .content("Celle-ci est désormais visible en cuisine.\n" +
-                                        "Vous pouvez maintenant encaisser le client depuis l'onglet \"Liste\".")
-                                .cancelable(false)
-                                .negativeText("Fermer")
-                                .onNegative(new MaterialDialog.SingleButtonCallback() {
-                                    @Override
-                                    public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
-                                        OrderGenericActivity.this.finish();
-                                    }
-                                })
-                                .show();
-                    } else {
-                        materialDialog = new MaterialDialog.Builder(OrderGenericActivity.this)
-                                .title("Erreur")
-                                .content(obj.getString("cause"))
-                                .cancelable(false)
-                                .negativeText("Fermer")
-                                .show();
-                    }
-                } catch (JSONException e) {
-                    Toast.makeText(OrderGenericActivity.this, "Erreur serveur", Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
-                }
+            if (apiResponse.isValid()) {
+                materialDialog = new MaterialDialog.Builder(OrderGenericActivity.this)
+                        .title("Commande envoyée !")
+                        .content("Celle-ci est désormais visible en cuisine.\n" +
+                                "Vous pouvez maintenant encaisser le client depuis l'onglet \"Liste\".")
+                        .cancelable(false)
+                        .negativeText("Fermer")
+                        .onNegative(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
+                                OrderGenericActivity.this.finish();
+                            }
+                        })
+                        .show();
             } else {
-                Toast.makeText(OrderGenericActivity.this, "Erreur réseau", Toast.LENGTH_SHORT).show();
+                materialDialog = new MaterialDialog.Builder(OrderGenericActivity.this)
+                        .title("Erreur")
+                        .content(apiResponse.getError())
+                        .cancelable(false)
+                        .negativeText("Fermer")
+                        .onNegative(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
+                                OrderGenericActivity.this.finish();
+                            }
+                        })
+                        .show();
             }
 
         }
     }
 
-    public void fillCartItem (ArrayList<RootItem> array, int level) {
-        for (int i=0;array != null && i<array.size();i++) {
+    public void fillCartItem(ArrayList<RootItem> array, int level) {
+        for (int i = 0; array != null && i < array.size(); i++) {
             cartItems.add(new CartItem(array.get(i), level));
             fillCartItem(array.get(i).getItems(), level + 1);
         }
@@ -533,13 +531,13 @@ public class OrderGenericActivity extends AppCompatActivity {
     // - dataset for cart adapter
     // - cart item count
     // - cart total price
-    public void updateCartArray () {
+    public void updateCartArray() {
         cartItems.clear();
         fillCartItem(DataStore.getInstance().getCartItems(), 0);
         int quantity = DataStore.getInstance().getCartItems().size();
         tvResume.setText(
-                "Panier (" + quantity + " élément" + (quantity>0?"s":"") + ") " +
-                new DecimalFormat("0.00").format(DataStore.getInstance().getCartPrice()) + "€"
+                "Panier (" + quantity + " élément" + (quantity > 0 ? "s" : "") + ") " +
+                        new DecimalFormat("0.00").format(DataStore.getInstance().getCartPrice()) + "€"
         );
         //tvTotal.setText(new DecimalFormat("0.00").format(DataStore.getInstance().getCartPrice()) + "€");
         tvTotal.setVisibility(View.GONE);
@@ -547,18 +545,18 @@ public class OrderGenericActivity extends AppCompatActivity {
     }
 
     // Init UI objects
-    public void initLayout () {
+    public void initLayout() {
         updateCartArray();
         setHelperText("Sélectionnez une catégorie, puis ajoutez un menu ou un élément");
     }
 
     // Set helper text
-    public void setHelperText (String text) {
+    public void setHelperText(String text) {
         tvIndicator.setText("« " + text + " »");
     }
 
     // Add elements data into display item array
-    public void updateDisplayArray (int selected) {
+    public void updateDisplayArray(int selected) {
 
         String catname = DataStore.getInstance().getCategoryItems().get(selected).getCatname();
 
@@ -583,8 +581,8 @@ public class OrderGenericActivity extends AppCompatActivity {
                 }
             }
 
-        // Ingredients : displays all ingredients a client could add to a sandwich / panini / etc
-        // (items where ingredients property > 0)
+            // Ingredients : displays all ingredients a client could add to a sandwich / panini / etc
+            // (items where ingredients property > 0)
         } else if (currentMode == MODE_INGREDIENTS) {
 
             // Ingredients
@@ -594,8 +592,8 @@ public class OrderGenericActivity extends AppCompatActivity {
                 displayItems.add(new DisplayItem(ii));
             }
 
-        // Primary Elements : displays all primary elements a client could add to a menu
-        // (sandwich, panini, etc ... items where ingredients property > 0, and where outOfMenu is false)
+            // Primary Elements : displays all primary elements a client could add to a menu
+            // (sandwich, panini, etc ... items where ingredients property > 0, and where outOfMenu is false)
         } else if (currentMode == MODE_ELEMENTS_PRIMARY) {
 
             // Primary Elements ?
@@ -606,8 +604,8 @@ public class OrderGenericActivity extends AppCompatActivity {
                 }
             }
 
-        // Secondary Elements : displays all secondary elements a client could add to a menu
-        // (yogurt, cream, etc ... items where ingredients property is 0, and where outOfMenu is false)
+            // Secondary Elements : displays all secondary elements a client could add to a menu
+            // (yogurt, cream, etc ... items where ingredients property is 0, and where outOfMenu is false)
         } else if (currentMode == MODE_ELEMENTS_SECONDARY) {
 
             // Secondary Elements ?
@@ -623,7 +621,7 @@ public class OrderGenericActivity extends AppCompatActivity {
     }
 
     // Decide about what a display item touch does
-    void actionDisplayTouch (DisplayItem displayItem, RootItem linkItem) {
+    void actionDisplayTouch(DisplayItem displayItem, RootItem linkItem) {
 
         switch (linkItem.getType()) {
 
@@ -707,7 +705,7 @@ public class OrderGenericActivity extends AppCompatActivity {
 
                         selectedMenu.addItem(elementItem);
 
-                        if (selectedMenu.getItems().size() < ((MenuItem)selectedMenu).getNbElems()) {
+                        if (selectedMenu.getItems().size() < ((MenuItem) selectedMenu).getNbElems()) {
                             // Set helper text
                             setHelperText("Choisissez l'élément secondaire " + (selectedMenu.getItems().size() + 1) + "/" + ((MenuItem) selectedMenu).getNbElems() + " du menu " + selectedMenu.getName());
                         } else {
@@ -764,7 +762,7 @@ public class OrderGenericActivity extends AppCompatActivity {
     // Search for an element in a sub item
     // null → in cart
     // TODO
-    public int searchForElement (RootItem parent, String idstr) {
+    public int searchForElement(RootItem parent, String idstr) {
         int rootPos = -1;
         if (parent != null) {
             if (parent.getItems() != null) {

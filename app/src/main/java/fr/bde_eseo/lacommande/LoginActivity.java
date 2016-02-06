@@ -76,7 +76,28 @@ public class LoginActivity extends AppCompatActivity {
         String lastLogin = prefs.getString(Constants.PREFS_KEY_LOGIN, "");
         if (lastLogin.length() > 0) {
             etLogin.setText(lastLogin);
-            etPassword.requestFocus();
+            //etPassword.requestFocus();
+
+            // Login auto (debug) pour gagner du temps
+            String lastPwd = prefs.getString(Constants.PREFS_KEY_PASSWORD, "");
+            if (lastPwd.length() > 0) {
+                etPassword.setText(lastPwd);
+
+                tvProgress.setText("Préparation ... ");
+                tvProgress.setVisibility(View.VISIBLE);
+                progressConnect.setVisibility(View.VISIBLE);
+                Utilities.hideSoftKeyboard(LoginActivity.this);
+
+                new Handler().postDelayed(
+                        new Runnable() {
+
+                            @Override
+                            public void run() {
+                                AsyncConnectClub asyncConnectClub = new AsyncConnectClub();
+                                asyncConnectClub.execute();
+                            }
+                        }, 600);
+            }
         }
 
         // Listen for connexion intent
@@ -107,14 +128,14 @@ public class LoginActivity extends AppCompatActivity {
     private class AsyncConnectClub extends AsyncTask<String, String, APIResponse> {
 
         private String login;
-        private String password;
+        private String password, shaPass;
         private String version;
 
         @Override
         protected APIResponse doInBackground(String... params) {
             HashMap<String, String> pairs = new HashMap<>();
             pairs.put("login", login);
-            pairs.put("password", password);
+            pairs.put("password", shaPass);
             pairs.put("version", version);
 
             return APIUtils.postAPIData(Constants.API_CLUB_LOGIN, pairs, context);
@@ -124,7 +145,8 @@ public class LoginActivity extends AppCompatActivity {
         protected void onPreExecute() {
             login = etLogin.getText().toString().toLowerCase(Locale.FRANCE).trim();
             etLogin.setText(login);
-            password = EncryptUtils.sha256(etPassword.getText().toString() + getResources().getString(R.string.salt_password));
+            password = etPassword.getText().toString();
+            shaPass = EncryptUtils.sha256(password + getResources().getString(R.string.salt_password));
             version = BuildConfig.VERSION_NAME;
             tvProgress.setVisibility(View.VISIBLE);
             tvProgress.setText("Authentification ...");
@@ -141,10 +163,11 @@ public class LoginActivity extends AppCompatActivity {
 
                             // Login ok
                             tvProgress.setText("Connecté");
-                            DataStore.getInstance().setClubMember(new ClubMember(login, password, apiResponse.getJsonData()));
+                            DataStore.getInstance().setClubMember(new ClubMember(login, shaPass, apiResponse.getJsonData()));
 
                             // Save login
                             prefs_Write.putString(Constants.PREFS_KEY_LOGIN, login);
+                            prefs_Write.putString(Constants.PREFS_KEY_PASSWORD, password);
                             prefs_Write.apply();
 
                             // Update client data
