@@ -8,6 +8,7 @@
     <color name="orange_pressed">#c74410</color>
     <color name="orange_normal">#ff9060</color>
     <color name="dialog_text_warning">#2e2a2a</color>
+    <color name="empty_text_clear">#848484</color>
 
 
     <!-- google's material design colours from

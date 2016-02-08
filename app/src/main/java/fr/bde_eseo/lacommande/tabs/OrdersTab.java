@@ -52,6 +52,7 @@ public class OrdersTab extends Fragment {
     private RecyclerView recyList;
     private ProgressBar progressBar;
     private TextView tvUpdateInfo;
+    private TextView tvNoOrder;
     private ImageView imgNetworkInfo;
     private TextView tvNetworkInfo;
     private ProgressBar progressNetwork;
@@ -88,9 +89,11 @@ public class OrdersTab extends Fragment {
         recyList.setItemAnimator(new DefaultItemAnimator());
         tvUpdateInfo = (TextView) rootView.findViewById(R.id.tvUpdateInfo);
         tvNetworkInfo = (TextView) rootView.findViewById(R.id.tvNetworkInfo);
+        tvNoOrder = (TextView) rootView.findViewById(R.id.tvNoOrder);
         imgNetworkInfo = (ImageView) rootView.findViewById(R.id.icoNetwork);
         progressNetwork = (ProgressBar) rootView.findViewById(R.id.progressNetwork);
         progressNetwork.setVisibility(View.VISIBLE);
+        tvNoOrder.setVisibility(View.INVISIBLE);
         /*GridLayoutManager glm = new GridLayoutManager(getActivity(), 4);
         glm.setOrientation(LinearLayoutManager.VERTICAL);
         glm.setReverseLayout(false);
@@ -210,6 +213,7 @@ public class OrdersTab extends Fragment {
 
             run = false;
             if (firstDisplay) {
+                tvNoOrder.setVisibility(View.INVISIBLE);
                 progressBar.setVisibility(View.VISIBLE);
                 progressNetwork.setVisibility(View.VISIBLE);
                 recyList.setVisibility(View.INVISIBLE);
@@ -286,6 +290,11 @@ public class OrdersTab extends Fragment {
                         orderItems.addAll(listPreparing);
                         orderItems.addAll(listReady);
                         orderItems.add(new OrderItem("")); // Empty header to add space at the end of the listview
+
+                        if (orderItems.size() == 1) // 1 cause empty order item (end space, see below)
+                            tvNoOrder.setVisibility(View.VISIBLE);
+                        else
+                            tvNoOrder.setVisibility(View.INVISIBLE);
 
                         if (quantA > 0) orderItems.get(0).setFriendlyText("EN PRÉPARATION (" + quantA + ")");
                         if (quantB > 0) orderItems.get(listPreparing.size()).setFriendlyText("PRÊTES (" + quantB + ")");

@@ -20,7 +20,6 @@ public class CategoryItem {
     public CategoryItem(JSONObject obj) throws JSONException {
         this.name = obj.getString("name");
         this.catname = obj.getString("catname");
-        Log.d("JSON", "ADD Category : " + name + " , " + catname);
     }
 
     public String getName() {

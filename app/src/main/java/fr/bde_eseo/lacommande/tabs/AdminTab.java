@@ -3,6 +3,7 @@ package fr.bde_eseo.lacommande.tabs;
 import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,7 +19,9 @@ import java.util.ArrayList;
 import fr.bde_eseo.lacommande.MainActivity;
 import fr.bde_eseo.lacommande.R;
 import fr.bde_eseo.lacommande.admin.ClubListActivity;
+import fr.bde_eseo.lacommande.admin.ParametersAsyncDialog;
 import fr.bde_eseo.lacommande.admin.PlanningActivity;
+import fr.bde_eseo.lacommande.admin.ServiceAsyncDialog;
 import fr.bde_eseo.lacommande.listeners.RecyclerItemClickListener;
 
 /**
@@ -36,8 +39,10 @@ public class AdminTab extends Fragment {
     // Action
     private static final int ACTION_CLUBS = 0;
     private static final int ACTION_PLANNING = 1;
-    private static final int ACTION_MENUS = 2;
-    private static final int ACTION_STOCKS = 3;
+    private static final int ACTION_SETTINGS = 2;
+    private static final int ACTION_MESSAGE = 3;
+    private static final int ACTION_MENUS = 4;
+    private static final int ACTION_STOCKS = 5;
 
 
     @Override
@@ -49,8 +54,8 @@ public class AdminTab extends Fragment {
         CharSequence desc[] = getResources().getStringArray(R.array.items_admin_descriptions);
         TypedArray icons = getResources().obtainTypedArray(R.array.items_admin_icons);
         adminItems = new ArrayList<>();
-        for (int i=0;i<titles.length;i++) {
-            adminItems.add(new AdminItem((String)titles[i], (String)desc[i], icons.getResourceId(i, -1)));
+        for (int i = 0; i < titles.length; i++) {
+            adminItems.add(new AdminItem((String) titles[i], (String) desc[i], icons.getResourceId(i, -1)));
         }
         icons.recycle();
 
@@ -79,6 +84,14 @@ public class AdminTab extends Fragment {
 
                     case ACTION_PLANNING:
                         myIntent = new Intent(getActivity(), PlanningActivity.class);
+                        break;
+
+                    case ACTION_SETTINGS:
+                        new ParametersAsyncDialog(getActivity()).execute();
+                        break;
+
+                    case ACTION_MESSAGE:
+                        new ServiceAsyncDialog(getActivity()).execute();
                         break;
 
                     case ACTION_MENUS:

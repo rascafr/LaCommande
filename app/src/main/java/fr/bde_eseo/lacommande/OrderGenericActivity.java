@@ -14,15 +14,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
@@ -55,6 +53,7 @@ public class OrderGenericActivity extends AppCompatActivity {
     private TextView tvIndicator;
     private TextView tvResume;
     private EditText etInstr;
+    private LinearLayout llLoad;
 
     // Adapters
     private CartAdapter cartAdapter;
@@ -93,6 +92,9 @@ public class OrderGenericActivity extends AppCompatActivity {
         // Set UI Main Layout
         setContentView(R.layout.activity_generic_order);
 
+        // Arrow back to main activity
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         // Get intent's parameters
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
@@ -117,6 +119,8 @@ public class OrderGenericActivity extends AppCompatActivity {
         tvResume = (TextView) findViewById(R.id.tvResume);
         buttonValid = (Button) findViewById(R.id.buttonValid);
         buttonCancel = (Button) findViewById(R.id.buttonCancel);
+        llLoad = (LinearLayout) findViewById(R.id.llLoadOrder);
+        llLoad.setVisibility(View.INVISIBLE);
 
         // Init data
         currentMode = MODE_NAVIGATE;
@@ -246,6 +250,34 @@ public class OrderGenericActivity extends AppCompatActivity {
                 }
             }
         });
+
+        buttonCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                switch (currentMode) {
+
+                    // If mode is Primary, end it, delete item
+                    case MODE_ELEMENTS_PRIMARY:
+                        currentMode = MODE_NAVIGATE;
+                        setHelperText("Sélectionnez une catégorie, puis ajoutez un menu ou un élément");
+                        //DataStore.getInstance().getCartItems().remove();
+                        break;
+
+                    // If mode is Secondary, end it, delete item
+                    case MODE_ELEMENTS_SECONDARY:
+                        currentMode = MODE_NAVIGATE;
+                        setHelperText("Sélectionnez une catégorie, puis ajoutez un menu ou un élément");
+                        break;
+
+                }
+
+                // Update data
+                updateButtonProperties();
+                updateDisplayArray(0);
+                categoryAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     private class CartAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -354,15 +386,20 @@ public class OrderGenericActivity extends AppCompatActivity {
             if (selectedItem == position) {
                 ch.cardView.setCardBackgroundColor(getResources().getColor(R.color.md_orange_200));
             } else {
-                ch.cardView.setCardBackgroundColor(getResources().getColor(R.color.md_blue_grey_50));
+                if (currentMode == MODE_NAVIGATE) ch.cardView.setCardBackgroundColor(getResources().getColor(R.color.md_blue_grey_50));
+                else ch.cardView.setCardBackgroundColor(getResources().getColor(R.color.md_grey_500));
             }
 
             ch.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    selectedItem = position;
-                    categoryAdapter.notifyDataSetChanged();
-                    updateDisplayArray(selectedItem);
+
+                    // Il n'est possible de changer la catégorie qu'en mode navigation
+                    if (currentMode == MODE_NAVIGATE) {
+                        selectedItem = position;
+                        categoryAdapter.notifyDataSetChanged();
+                        updateDisplayArray(selectedItem);
+                    }
                 }
             });
         }
@@ -411,6 +448,7 @@ public class OrderGenericActivity extends AppCompatActivity {
 
                     // Perform operations (add to cart, etc)
                     actionDisplayTouch(di, di.getLinkItem());
+                    updateButtonProperties();
                 }
             });
         }
@@ -444,11 +482,14 @@ public class OrderGenericActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            llLoad.setVisibility(View.VISIBLE);
         }
 
         @Override
         protected void onPostExecute(String data) {
             super.onPostExecute(data);
+
+            llLoad.setVisibility(View.INVISIBLE);
 
             if (Utilities.isNetworkDataValid(data)) {
                 DataStore.getInstance().setCafetData(data);
@@ -494,7 +535,7 @@ public class OrderGenericActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(APIResponse apiResponse) {
+        protected void onPostExecute(final APIResponse apiResponse) {
 
             materialDialog.hide();
 
@@ -521,7 +562,10 @@ public class OrderGenericActivity extends AppCompatActivity {
                         .onNegative(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
-                                OrderGenericActivity.this.finish();
+                                if (apiResponse.isNetworkBad())
+                                    materialDialog.hide();
+                                else
+                                    OrderGenericActivity.this.finish();
                             }
                         })
                         .show();
@@ -672,6 +716,9 @@ public class OrderGenericActivity extends AppCompatActivity {
                 // Memorize menu item
                 selectedMenu = menuItem;
 
+                // Update category
+                categoryAdapter.notifyDataSetChanged();
+
                 // Display primary elements
                 updateDisplayArray(0);
                 break;
@@ -695,15 +742,34 @@ public class OrderGenericActivity extends AppCompatActivity {
                     if (selectedMenu != null) {
                         selectedMenu.addItem(elementItem);
                     } else {
-                        // Else, add it directly to cart
-                        DataStore.getInstance().getCartItems().add(elementItem);
+
+                        // Else, use directly cart array
+
+                        // If element is selected : remove it
+                        if (displayItem.isSelected()) {
+                            displayItem.setIsSelected(false);
+                            DataStore.getInstance().getCartItems().remove(
+                                    searchForElement(selectedElement, displayItem.getLinkItem().getId())
+                            );
+                        } else {
+                            // Else, add it
+                            DataStore.getInstance().getCartItems().add(elementItem);
+
+                            // Mark the display item as selected
+                            displayItem.setIsSelected(true);
+                        }
+
+                        // Update screen
+                        displayAdapter.notifyDataSetChanged();
+                        updateCartArray();
                     }
 
                     // Memorize element item
                     selectedElement = elementItem;
 
-                    // Update cart array
+                    // Update cart and category array
                     updateCartArray();
+                    categoryAdapter.notifyDataSetChanged();
 
                     // Display ingredients
                     updateDisplayArray(0);
@@ -727,6 +793,7 @@ public class OrderGenericActivity extends AppCompatActivity {
                             currentMode = MODE_NAVIGATE;
                             // Reset display
                             updateDisplayArray(0);
+                            categoryAdapter.notifyDataSetChanged();
                         }
                     } else {
                         // Else, add it directly to cart
@@ -792,17 +859,38 @@ public class OrderGenericActivity extends AppCompatActivity {
         switch (currentMode) {
 
             case MODE_NAVIGATE:
-                buttonValid.setText("Finaliser");
+                buttonValid.setText("Envoyer");
                 buttonValid.setVisibility(View.VISIBLE);
-                buttonCancel.setVisibility(View.INVISIBLE);
+                buttonCancel.setVisibility(View.GONE);
+                break;
+
+            // Primary mode :
+            // → Next : press item (croc, sandw, etc)
+            // → Cancel : remove item and go back to navigate mode
+            case MODE_ELEMENTS_PRIMARY:
+                buttonValid.setVisibility(View.GONE);
+                buttonCancel.setText("Annuler");
+                buttonCancel.setVisibility(View.VISIBLE);
                 break;
 
             case MODE_INGREDIENTS:
-                buttonValid.setText("Terminer");
+                buttonValid.setText("Valider");
                 buttonValid.setVisibility(View.VISIBLE);
-                buttonValid.setText("Annuler");
+                buttonCancel.setText("Annuler");
                 buttonCancel.setVisibility(View.VISIBLE);
                 break;
         }
+    }
+
+    // Go back with menu
+    @Override
+    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                OrderGenericActivity.this.onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

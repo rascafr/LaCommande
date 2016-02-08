@@ -26,6 +26,10 @@ public class APIResponse {
         return status == 1;
     }
 
+    public boolean isNetworkBad() {
+        return status == 0;
+    }
+
     public int getStatus() {
         return status;
     }

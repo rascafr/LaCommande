@@ -77,15 +77,20 @@ public class NewTab extends Fragment {
                             @Override
                             public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
                                 String clientName = autoCompleteTextView.getText().toString();
-                                AsyncToken asyncToken = new AsyncToken(
-                                        getActivity(),
-                                        DataStore.getInstance().getClubMember().getLogin(),
-                                        DataStore.getInstance().getClubMember().getPassword(),
-                                        DataStore.getInstance().searchForClient(clientName).getLogin(),
-                                        BuildConfig.VERSION_NAME,
-                                        clientName
-                                );
-                                asyncToken.execute();
+                                ClientItem ci = DataStore.getInstance().searchForClient(clientName);
+                                if (ci != null) {
+                                    AsyncToken asyncToken = new AsyncToken(
+                                            getActivity(),
+                                            DataStore.getInstance().getClubMember().getLogin(),
+                                            DataStore.getInstance().getClubMember().getPassword(),
+                                            ci.getLogin(),
+                                            BuildConfig.VERSION_NAME,
+                                            clientName
+                                    );
+                                    asyncToken.execute();
+                                } else {
+                                    Toast.makeText(getActivity(), "Cette personne n'est pas enregistrée comme étant un client.", Toast.LENGTH_SHORT).show();
+                                }
                             }
                         })
                         .cancelable(true);

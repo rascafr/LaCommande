@@ -35,8 +35,6 @@ public class MenuItem extends RootItem {
 
         this.nbSandw = obj.getInt("nbMainElem");
         this.nbElems = obj.getInt("nbSecoElem");
-
-        Log.d("MENUS", getName() + ", " + getId() + ", " + getPrice() + ", " + nbSandw + ", " + nbElems);
     }
 
     public MenuItem (MenuItem menuItem) {

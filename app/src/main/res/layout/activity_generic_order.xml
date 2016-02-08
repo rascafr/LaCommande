@@ -152,43 +152,71 @@
             android:layout_alignStart="@+id/tvStackMoreText"
             android:layout_alignEnd="@+id/tvStackMoreText"/>
 
-        <Button
-            android:id="@+id/buttonValid"
+
+
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:textColor="@color/white"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:textStyle="bold"
-            android:gravity="center"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:layout_centerVertical="true"
-            android:background="@drawable/flat_stack_button"
-            android:layout_alignParentRight="true"
-            android:textSize="16sp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
-            android:text="Valider"/>
+            android:layout_alignParentRight="true">
 
-        <Button
-            android:id="@+id/buttonCancel"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:textColor="@color/white"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:background="@drawable/flat_stack_button"
-            android:textSize="16sp"
-            android:text="Annuler"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
-            android:layout_toLeftOf="@+id/buttonValid"/>
+            <Button
+                android:id="@+id/buttonCancel"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textColor="@color/white"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:background="@drawable/flat_stack_button"
+                android:textSize="16sp"
+                android:text="Annuler"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"/>
 
+            <Button
+                android:id="@+id/buttonValid"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textColor="@color/white"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:background="@drawable/flat_stack_button"
+                android:textSize="16sp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:text="Valider"/>
+
+        </LinearLayout>
     </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/llLoadOrder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:layout_marginTop="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:text="@string/order_load"/>
+
+    </LinearLayout>
 
 </RelativeLayout>

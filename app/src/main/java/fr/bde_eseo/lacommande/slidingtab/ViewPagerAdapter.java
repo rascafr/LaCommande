@@ -50,9 +50,6 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
 
             case 3:
                 return new EmptyTab();
-
-            case 4:
-                return new EmptyTab();
         }
         return null;
     }

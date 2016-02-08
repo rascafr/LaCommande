@@ -79,6 +79,7 @@ public class ClientListActivity extends AppCompatActivity {
 
         // Arrow back to main activity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Test");
 
         // Get objects
         progressClient = (ProgressBar) findViewById(R.id.progressClients);

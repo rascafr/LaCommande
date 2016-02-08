@@ -30,8 +30,6 @@ public class ElementItem extends RootItem {
         this.outOfMenu = obj.getInt("outofmenu") == 1;
         this.inStock = obj.getInt("stock") != 0;
         this.ingredients = obj.getInt("hasingredients");
-
-        Log.d("JSON", "ADD Element : " + getId() + " - " + getName() + " - " + getPrice() + "€");
     }
 
     public ElementItem(ElementItem elementItem) {

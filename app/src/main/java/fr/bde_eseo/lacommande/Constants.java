@@ -63,6 +63,14 @@ public class Constants {
     public final static String API_ORDER_ITEMS = URL_API + "order/items.php";
     public final static String API_ORDER_SEND = URL_API + "order/send.php";
 
+    // Parameters
+    public final static String API_PARAMETERS_LIST = URL_API + "parameters/list.php";
+    public final static String API_PARAMETERS_UPDATE = URL_API + "parameters/update.php";
+
+    // Service
+    public final static String API_SERVICE_READ = URL_API + "service/read.php";
+    public final static String API_SERVICE_UPDATE = URL_API + "service/update.php";
+
     /**
      * Preferences
      */

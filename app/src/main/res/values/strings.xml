@@ -5,14 +5,16 @@
     <string name="action_settings">Settings</string>
     <string name="activity_clients">Liste des clients</string>
     <string name="activity_order">Nouvelle commande</string>
-    
+
+    <string name="menu_exit">Quitter</string>
+    <string name="menu_help">Aide</string>
+
     <!-- Sliding tabs Strings -->
     <array name="tabs_names">
         <item>Comptoir</item>
         <item>Liste</item>
         <item>Historique</item>
         <item>Impayés</item>
-        <item>Fermeture</item>
     </array>
 
     <array name="tabs_names_admin">
@@ -21,7 +23,6 @@
         <item>Liste</item>
         <item>Historique</item>
         <item>Impayés</item>
-        <item>Fermeture</item>
     </array>
 
     <!-- Login Activity Strings -->
@@ -45,6 +46,8 @@
     <string-array name="items_admin_titles">
         <item>Comptes Clubs</item>
         <item>Panning Caféteria</item>
+        <item>Paramètres</item>
+        <item>Message de service</item>
         <item>Menus et Elements</item>
         <item>Gestion des stocks</item>
     </string-array>
@@ -52,6 +55,8 @@
     <string-array name="items_admin_descriptions">
         <item>Ajoutez, modifiez les logins et mots de passe ou supprimez les comptes des clubs qui ont accès à la commande caféteria</item>
         <item>Définissez les jours et heures d\'ouverture / fermeture du service de la caféteria</item>
+        <item>Modifiez la valeur des réglages de la cafet tels que l\'accès à Lyida ou l\'ouverture du service en ligne</item>
+        <item>Définissez le message de service qui sera affiché dans l\'onglet "Cafet" des applications</item>
         <item>Ajoutez, modifiez ou supprimez les menus et élements qui sont proposés aux étudiants</item>
         <item>Marquez un élement ou un ingrédient comme indisponible temporairement afin qu\'il n\'apparaîsse pas dans les menus proposés</item>
     </string-array>
@@ -59,12 +64,16 @@
     <array name="items_admin_icons">
         <item>@drawable/ic_club_set</item>
         <item>@drawable/ic_planner</item>
+        <item>@drawable/ic_settings</item>
+        <item>@drawable/ic_ad</item>
         <item>@drawable/ic_ingredients</item>
         <item>@drawable/ic_fish</item>
     </array>
 
     <string name="share_using">Partager depuis ...</string>
     <string name="history_pages">Page : </string>
+    <string name="order_load">Mise à jour des données ...</string>
+    <string name="no_order">Aucune commande en cours.\nVous pouvez vous reposer !</string>
 
     <!-- Random Strings for Password generation -->
     <string-array name="password_samples">
