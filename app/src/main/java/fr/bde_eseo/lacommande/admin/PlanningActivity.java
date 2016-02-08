@@ -371,7 +371,7 @@ public class PlanningActivity extends AppCompatActivity {
         public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
 
             final DayItem di = dayItems.get(position);
-            DayItemViewHolder divh = (DayItemViewHolder) holder;
+            final DayItemViewHolder divh = (DayItemViewHolder) holder;
 
             divh.vTitle.setText(di.getName());
 
@@ -413,10 +413,10 @@ public class PlanningActivity extends AppCompatActivity {
 
             divh.checkOpen.setChecked(di.isOpen());
 
-            divh.checkOpen.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            divh.checkOpen.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    di.setIsOpen(isChecked);
+                public void onClick(View v) {
+                    di.setIsOpen(divh.checkOpen.isChecked());
                     hasChanged = true;
                 }
             });
