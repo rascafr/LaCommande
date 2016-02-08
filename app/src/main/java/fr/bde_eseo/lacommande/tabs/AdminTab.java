@@ -22,6 +22,7 @@ import fr.bde_eseo.lacommande.admin.ClubListActivity;
 import fr.bde_eseo.lacommande.admin.ParametersAsyncDialog;
 import fr.bde_eseo.lacommande.admin.PlanningActivity;
 import fr.bde_eseo.lacommande.admin.ServiceAsyncDialog;
+import fr.bde_eseo.lacommande.admin.StockActivity;
 import fr.bde_eseo.lacommande.listeners.RecyclerItemClickListener;
 
 /**
@@ -99,7 +100,7 @@ public class AdminTab extends Fragment {
                         break;
 
                     case ACTION_STOCKS:
-                        Toast.makeText(getActivity(), "Fonctionnalité non disponible", Toast.LENGTH_SHORT).show();
+                        myIntent = new Intent(getActivity(), StockActivity.class);
                         break;
                 }
 

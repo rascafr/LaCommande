@@ -71,6 +71,10 @@ public class Constants {
     public final static String API_SERVICE_READ = URL_API + "service/read.php";
     public final static String API_SERVICE_UPDATE = URL_API + "service/update.php";
 
+    // Stock
+    public final static String API_STOCK_LIST = URL_API + "stock/list.php";
+    public final static String API_STOCK_UPDATE = URL_API + "stock/update.php";
+
     /**
      * Preferences
      */

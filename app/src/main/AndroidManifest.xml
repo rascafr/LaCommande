@@ -63,6 +63,13 @@
             android:screenOrientation="landscape"
             android:theme="@style/AppTheme" >
         </activity>
+
+        <activity
+            android:name="fr.bde_eseo.lacommande.admin.StockActivity"
+            android:label="@string/activity_admin_stocks"
+            android:screenOrientation="landscape"
+            android:theme="@style/AppTheme" >
+        </activity>
     </application>
 
 </manifest>

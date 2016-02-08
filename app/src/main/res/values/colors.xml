@@ -9,6 +9,10 @@
     <color name="orange_normal">#ff9060</color>
     <color name="dialog_text_warning">#2e2a2a</color>
     <color name="empty_text_clear">#848484</color>
+    <color name="item_element">#55cd53</color>
+    <color name="back_element">#e0f5e6</color>
+    <color name="item_ingredient">#fe7c48</color>
+    <color name="back_ingredient">#f9eae5</color>
 
 
     <!-- google's material design colours from

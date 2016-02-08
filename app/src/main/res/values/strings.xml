@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">LaCommande</string>
     <string name="activity_admin_clubs">Comptes Clubs</string>
+    <string name="activity_admin_stocks">Gestion des stocks</string>
     <string name="activity_admin_plannings">Panning Caféteria</string>
     <string name="action_settings">Settings</string>
     <string name="activity_clients">Liste des clients</string>
