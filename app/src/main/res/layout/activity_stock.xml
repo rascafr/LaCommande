@@ -20,28 +20,19 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentTop="true" />
 
-    <LinearLayout
+    <com.melnykov.fab.FloatingActionButton
+        android:id="@+id/fabSave"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_gravity="bottom|end"
-        android:layout_marginLeft="14dp"
-        android:layout_marginRight="14dp"
-        android:layout_marginEnd="14dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginBottom="14dp">
-
-        <com.melnykov.fab.FloatingActionButton
-            android:id="@+id/fabSave"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_save"
-            android:layout_margin="14dp"
-            fab:fab_colorNormal="@color/md_red_600"
-            fab:fab_colorPressed="@color/md_red_800"
-            fab:fab_colorRipple="@color/md_red_300"/>
-
-    </LinearLayout>
+        android:layout_alignParentRight="true"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/ic_save"
+        fab:fab_colorNormal="@color/md_red_600"
+        fab:fab_colorPressed="@color/md_red_800"
+        fab:fab_colorRipple="@color/md_red_300"/>
 
 </RelativeLayout>
