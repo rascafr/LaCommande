@@ -168,7 +168,7 @@ public class ParametersAsyncDialog extends AsyncTask<String, String, String> {
         protected String doInBackground(String... params) {
 
             for (int i = 0; i < parameters.size(); i++) {
-                publishProgress(parameters.get(i).getName() + " - " + (i+1) + "/" + parameters.size());
+                publishProgress(parameters.get(i).getName() + " - " + (i + 1) + "/" + parameters.size());
                 HashMap<String, String> pairs = new HashMap<>();
                 pairs.put("login", clubMember.getLogin());
                 pairs.put("password", clubMember.getPassword());
@@ -199,6 +199,7 @@ public class ParametersAsyncDialog extends AsyncTask<String, String, String> {
         protected void onPostExecute(String response) {
             materialDialog.hide();
             if (response != null) Toast.makeText(context, "Erreur : " + response, Toast.LENGTH_SHORT).show();
+            else Toast.makeText(context, "Données synchronisées !", Toast.LENGTH_SHORT).show();
         }
 
         @Override

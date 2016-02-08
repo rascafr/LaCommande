@@ -138,6 +138,7 @@ public class ServiceAsyncDialog extends AsyncTask<String, String, String> {
         protected void onPostExecute(APIResponse response) {
             materialDialog.hide();
             if (!response.isValid()) Toast.makeText(context, "Erreur : " + response.getError(), Toast.LENGTH_SHORT).show();
+            else Toast.makeText(context, "Données synchronisées !", Toast.LENGTH_SHORT).show();
         }
 
         @Override
