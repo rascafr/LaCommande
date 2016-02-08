@@ -63,7 +63,6 @@
             android:id="@+id/icoNetwork"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="8dp"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="2dp"
             android:layout_width="20dp"
@@ -73,10 +72,13 @@
 
         <ProgressBar
             android:id="@+id/progressNetwork"
-            android:layout_alignStart="@id/icoNetwork"
-            android:layout_alignEnd="@id/icoNetwork"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
             android:layout_width="20dp"
-            android:layout_height="20dp"/>
+            android:layout_height="20dp"
+            android:visibility="invisible"/>
 
         <TextView
             android:layout_toLeftOf="@id/icoNetwork"
