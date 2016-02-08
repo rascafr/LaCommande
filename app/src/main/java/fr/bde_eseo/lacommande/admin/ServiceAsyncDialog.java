@@ -114,7 +114,6 @@ public class ServiceAsyncDialog extends AsyncTask<String, String, String> {
             pairs.put("password", clubMember.getPassword());
             try {
                 pairs.put("service", Base64.encodeToString(service.getBytes("UTF-8"), Base64.NO_WRAP));
-                Log.d("SRV", pairs.get("service"));
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }

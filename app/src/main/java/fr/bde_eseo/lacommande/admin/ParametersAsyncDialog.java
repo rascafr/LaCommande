@@ -94,7 +94,6 @@ public class ParametersAsyncDialog extends AsyncTask<String, String, String> {
                                         }
 
                                         for (Integer aWhich : which) {
-                                            Log.d("MD", "Callback : " + aWhich);
                                             if (aWhich != -1) {
                                                 parameters.get(aWhich).setValue(true);
                                             }
