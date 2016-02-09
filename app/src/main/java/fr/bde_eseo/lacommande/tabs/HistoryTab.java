@@ -53,6 +53,9 @@ public class HistoryTab extends Fragment {
     private static int currentPage = 0;
     private static int nbPages = 0;
 
+    // Progress circle visibility flag
+    private static boolean firstSync;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.tab_history, container, false);
@@ -76,6 +79,7 @@ public class HistoryTab extends Fragment {
         recyList.setAdapter(mAdapter);
 
         // Fill array with data
+        firstSync = true;
         AsyncHistory asyncHistory = new AsyncHistory();
         asyncHistory.execute("0");
 
@@ -229,7 +233,7 @@ public class HistoryTab extends Fragment {
         protected void onPreExecute() {
             super.onPreExecute();
             orderItems.clear();
-            progress.setVisibility(View.VISIBLE);
+            if (firstSync) progress.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -238,6 +242,9 @@ public class HistoryTab extends Fragment {
             progress.setVisibility(View.INVISIBLE);
 
             if (apiResponse.isValid()) {
+
+                if (firstSync) firstSync = false; // disable circle flag if data is valid
+
                 try {
 
                     // Order history
