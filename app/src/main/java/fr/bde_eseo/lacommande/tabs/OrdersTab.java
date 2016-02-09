@@ -72,7 +72,7 @@ public class OrdersTab extends Fragment {
     private static boolean run;
     private static boolean firstDisplay = true;
     private static String lastFetchedData = "";
-    private long lastUpdate = 0;
+    private static long lastUpdate = 0;
 
     // Android
     private Context context;
@@ -125,7 +125,7 @@ public class OrdersTab extends Fragment {
 
                 MaterialDialog.Builder mdb = new MaterialDialog.Builder(getActivity())
                         .customView(R.layout.dialog_orders, false);
-                        //.content(oi.getClientname() + " - " + new DecimalFormat("0.00").format(oi.getPrice()) + "€" + "\nCommande passée à " + oi.getDate() + "\n\n" + oi.getFriendlyText());
+                //.content(oi.getClientname() + " - " + new DecimalFormat("0.00").format(oi.getPrice()) + "€" + "\nCommande passée à " + oi.getDate() + "\n\n" + oi.getFriendlyText());
 
                 switch (oi.getOrderFullStatus()) {
 
@@ -209,9 +209,13 @@ public class OrdersTab extends Fragment {
     /**
      * Custom definition for AsyncTask downloader
      */
-    private class AsyncOrders extends AsyncTask<String, String, String> {
+    private class AsyncOrders extends APIAsyncTask {
 
         private long t1;
+
+        public AsyncOrders(Context context) {
+            super(context);
+        }
 
         @Override
         protected void onPreExecute() {
@@ -237,8 +241,7 @@ public class OrdersTab extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(String data) {
-            super.onPostExecute(data);
+        protected void onPostExecute(APIResponse apiResponse) {
 
             progressNetwork.setVisibility(View.INVISIBLE);
             imgNetworkInfo.setVisibility(View.VISIBLE);
@@ -248,39 +251,43 @@ public class OrdersTab extends Fragment {
             if (lastFetchedData.length() == 0) {
                 updateText = "---";
             } else {
-                long diff = (System.currentTimeMillis()-lastUpdate)/1000;
-                int min = (int)diff/60;
-                updateText = "Il y a " + (min!=0?min:"moins d'une") + " minute" + (min > 1?"s":"");
+                long diff = (System.currentTimeMillis() - lastUpdate) / 1000;
+                int min = (int) diff / 60;
+                updateText = "Il y a " + (min != 0 ? min : "moins d'une") + " minute" + (min > 1 ? "s" : "");
             }
 
             tvUpdateInfo.setText(updateText);
 
-            if (Utilities.isNetworkDataValid(data)) {
+            if (apiResponse.isValid()) {
 
                 tvNetworkInfo.setText("Connecté");
                 imgNetworkInfo.setImageResource(R.drawable.ic_connected);
 
-                // If data differs from the last one, update UI, else, do nothing
-                if (!data.equals(lastFetchedData)) {
+                try {
 
-                    // Update information
-                    lastUpdate = System.currentTimeMillis();
+                    // Get data
+                    JSONArray dataArray = apiResponse.getJsonData().getJSONArray("orders");
+                    String dataStr = dataArray.toString();
 
-                    // Prevent next iteration
-                    lastFetchedData = data;
+                    // If data differs from the last one, update UI, else, do nothing
+                    // We need to pass through toString method cause equals doesn't works with JSONArray
+                    if (!dataStr.equals(lastFetchedData)) {
 
-                    try {
+                        // Update information
+                        lastUpdate = System.currentTimeMillis();
+
+                        // Prevent next iteration
+                        lastFetchedData = dataStr;
 
                         ArrayList<OrderItem> listReady = new ArrayList<>();
                         ArrayList<OrderItem> listPreparing = new ArrayList<>();
                         int quantA = 0, quantB = 0;
 
                         orderItems.clear();
-                        JSONArray jsonArray = new JSONArray(data);
-                        for (int i = 0; i < jsonArray.length(); i++) {
+                        for (int i = 0; i < dataArray.length(); i++) {
                             //orderItems.add(new OrderItem(jsonArray.getJSONObject(i)));
 
-                            OrderItem oi = new OrderItem(jsonArray.getJSONObject(i));
+                            OrderItem oi = new OrderItem(dataArray.getJSONObject(i));
 
                             if (oi.getStatus() == 0) {
                                 if (listPreparing.size() == 0) {
@@ -312,11 +319,11 @@ public class OrdersTab extends Fragment {
                         mAdapter.notifyDataSetChanged();
                         recyList.setVisibility(View.VISIBLE);
 
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        tvNetworkInfo.setText("Déconnecté - Erreur serveur");
-                        imgNetworkInfo.setImageResource(R.drawable.ic_disconnected);
                     }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    tvNetworkInfo.setText("Déconnecté - Erreur serveur");
+                    imgNetworkInfo.setImageResource(R.drawable.ic_disconnected);
                 }
             } else {
                 tvNetworkInfo.setText("Déconnecté");
@@ -325,11 +332,6 @@ public class OrdersTab extends Fragment {
 
             mHandler.postDelayed(updateTimerThread, RUN_UPDATE);
             run = true;
-        }
-
-        @Override
-        protected String doInBackground(String... url) {
-            return ConnexionUtils.postServerData(url[0], null);
         }
     }
 
@@ -363,12 +365,12 @@ public class OrdersTab extends Fragment {
                 case TYPE_ORDER_ITEM:
 
                     OrderViewHolder ovh = (OrderViewHolder) holder;
-                    ((GradientDrawable)ovh.viewHead.getBackground()).setColor(Color.parseColor(oi.getColorHtml()));
+                    ((GradientDrawable) ovh.viewHead.getBackground()).setColor(Color.parseColor(oi.getColorHtml()));
                     ovh.vID.setText(oi.getIdstr() + " " + new DecimalFormat("000").format(oi.getIdmod()));
                     ovh.vClient.setText(oi.getClientname());
                     ovh.vClient.setTextColor(Color.parseColor(oi.getColorHtml()));
                     ovh.vDate.setText(oi.getDate());
-                    ovh.vPrice.setText(new DecimalFormat("0.00").format(oi.getPrice())+"€" + " • " + oi.getPaidStatus());
+                    ovh.vPrice.setText(new DecimalFormat("0.00").format(oi.getPrice()) + "€" + " • " + oi.getPaidStatus());
 
                     if (oi.getInstructions().length() == 0) {
                         ovh.vInstructions.setVisibility(View.GONE);
@@ -480,10 +482,10 @@ public class OrdersTab extends Fragment {
                 mAdapter.notifyDataSetChanged();
 
                 // Sync new data
-                AsyncOrders asyncOrders = new AsyncOrders();
-                asyncOrders.execute(Constants.URL_CURRENT_ORDERS_GET);
+                AsyncOrders asyncOrders = new AsyncOrders(context);
+                asyncOrders.execute(Constants.API_ORDER_LIST);
 
-            } else{
+            } else {
                 Toast.makeText(context, apiResponse.getError(), Toast.LENGTH_SHORT).show();
             }
         }
@@ -513,7 +515,7 @@ public class OrdersTab extends Fragment {
 
     @Override
     public void onPause() {
-        if( mHandler != null) {
+        if (mHandler != null) {
             mHandler.removeCallbacks(updateTimerThread);
         }
         run = false;
@@ -529,8 +531,8 @@ public class OrdersTab extends Fragment {
             try {
                 if (run) {
                     run = false;
-                    AsyncOrders asyncOrders = new AsyncOrders();
-                    asyncOrders.execute(Constants.URL_CURRENT_ORDERS_GET);
+                    AsyncOrders asyncOrders = new AsyncOrders(context);
+                    asyncOrders.execute(Constants.API_ORDER_LIST);
                 }
             } catch (NullPointerException e) { // Stop handler if fragment disappears
                 mHandler.removeCallbacks(updateTimerThread);
