@@ -6,10 +6,12 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -42,6 +44,8 @@ public class HistoryTab extends Fragment {
     private ProgressBar progress;
     private TextView tvPage;
     private ImageView actionStart, actionPrevious, actionNext, actionEnd;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private RecyclerView.OnItemTouchListener disabler;
 
     // Model
     private ArrayList<OrderItem> orderItems;
@@ -64,6 +68,9 @@ public class HistoryTab extends Fragment {
         // Assign UI layout
         orderItems = new ArrayList<>();
         mAdapter = new TrackHistoryAdapter();
+        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.history_refresh);
+        swipeRefreshLayout.setColorSchemeColors(R.color.colorPrimary);
+        disabler = new RecyclerViewDisabler();
         recyList = (RecyclerView) rootView.findViewById(R.id.recyList);
         progress = (ProgressBar) rootView.findViewById(R.id.progressLoad);
         tvPage = (TextView) rootView.findViewById(R.id.tvPage);
@@ -140,7 +147,36 @@ public class HistoryTab extends Fragment {
             }
         });
 
+        // Swipe-to-refresh implementation
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                AsyncHistory asyncHistory = new AsyncHistory(); // no circle here (already in SwipeLayout)
+                asyncHistory.execute(String.valueOf(currentPage));
+            }
+        });
+
         return rootView;
+    }
+
+
+    // Scroll listener to prevent issue 77846
+    public class RecyclerViewDisabler implements RecyclerView.OnItemTouchListener {
+
+        @Override
+        public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+            return true;
+        }
+
+        @Override
+        public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+
+        }
+
+        @Override
+        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+        }
     }
 
 
@@ -234,12 +270,14 @@ public class HistoryTab extends Fragment {
             super.onPreExecute();
             orderItems.clear();
             if (firstSync) progress.setVisibility(View.VISIBLE);
+            recyList.addOnItemTouchListener(disabler);
         }
 
         @Override
         protected void onPostExecute(APIResponse apiResponse) {
 
             progress.setVisibility(View.INVISIBLE);
+            recyList.setVisibility(View.VISIBLE);
 
             if (apiResponse.isValid()) {
 
@@ -253,7 +291,7 @@ public class HistoryTab extends Fragment {
                     // Last date for header positioning
                     String lastDate = "";
 
-                    for (int i=0;i<array.length();i++) {
+                    for (int i = 0; i < array.length(); i++) {
 
                         OrderItem oi = new OrderItem(array.getJSONObject(i));
 
@@ -274,7 +312,7 @@ public class HistoryTab extends Fragment {
 
                     // Current page
                     nbPages = apiResponse.getJsonData().getInt("pages") - 1; // cause 0 = page n°1
-                    tvPage.setText((currentPage+1) + " / " + (nbPages+1));
+                    tvPage.setText((currentPage + 1) + " / " + (nbPages + 1));
 
                     mAdapter.notifyDataSetChanged();
                 } catch (JSONException e) {
@@ -285,6 +323,9 @@ public class HistoryTab extends Fragment {
             } else {
                 Toast.makeText(context, "Erreur réseau", Toast.LENGTH_SHORT).show();
             }
+
+            swipeRefreshLayout.setRefreshing(false);
+            recyList.removeOnItemTouchListener(disabler);
         }
     }
 
