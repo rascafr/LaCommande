@@ -102,7 +102,7 @@ public class APIUtils {
                 JSONObject obj = new JSONObject(str);
                 resp.setError(obj.getString("cause"));
                 resp.setStatus(obj.getInt("status"));
-                resp.setJsonData(obj.getJSONObject("data"));
+                resp.setJsonData(obj.optJSONObject("data"));
             } catch (JSONException e) {
                 e.printStackTrace();
             }

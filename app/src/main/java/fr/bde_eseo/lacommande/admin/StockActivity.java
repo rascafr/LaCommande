@@ -24,6 +24,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.melnykov.fab.FloatingActionButton;
 
@@ -33,9 +34,12 @@ import org.json.JSONObject;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import fr.bde_eseo.lacommande.Constants;
 import fr.bde_eseo.lacommande.R;
+import fr.bde_eseo.lacommande.model.ClubMember;
+import fr.bde_eseo.lacommande.model.DataStore;
 import fr.bde_eseo.lacommande.utils.APIResponse;
 import fr.bde_eseo.lacommande.utils.APIUtils;
 
@@ -58,6 +62,9 @@ public class StockActivity extends AppCompatActivity {
     // Android
     private Context context;
 
+    // Flag dataset has changed
+    private boolean hasChanged;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,6 +85,7 @@ public class StockActivity extends AppCompatActivity {
 
         // Init model / adapter
         stockItems = new ArrayList<>();
+        hasChanged = false;
         mAdapter = new StockAdapter();
         recyList.setHasFixedSize(false);
         StaggeredGridLayoutManager manager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
@@ -94,7 +102,7 @@ public class StockActivity extends AppCompatActivity {
         fabSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                new AsyncUpdateStock().execute();
             }
         });
 
@@ -158,6 +166,9 @@ public class StockActivity extends AppCompatActivity {
                                             if (cs.length() == 0) cs = "0"; // Prevents "" parse error
                                             si.setStock(Integer.parseInt(cs));
                                             notifyDataSetChanged();
+
+                                            // Flag dataset changed
+                                            hasChanged = true;
                                         }
                                     }).show();
 
@@ -176,6 +187,9 @@ public class StockActivity extends AppCompatActivity {
                         public void onClick(View v) {
                             si.setStock(sivh.chkStock.isChecked() ? 1 : 0);
                             notifyDataSetChanged();
+
+                            // Flag dataset changed
+                            hasChanged = true;
                         }
                     });
 
@@ -274,7 +288,7 @@ public class StockActivity extends AppCompatActivity {
                     ArrayList<StockItem> ingredients = new ArrayList<>();
                     JSONArray ingredientArray = apiResponse.getJsonData().getJSONArray("ingredients");
                     for (int i=0;i<ingredientArray.length();i++) {
-                        ingredients.add(new StockItem(elemArray.getJSONObject(i), false));
+                        ingredients.add(new StockItem(ingredientArray.getJSONObject(i), false));
                     }
 
                     // Add headers and data, if any
@@ -307,6 +321,74 @@ public class StockActivity extends AppCompatActivity {
         @Override
         protected APIResponse doInBackground(String... params) {
             return APIUtils.postAPIData(Constants.API_STOCK_LIST, null, context);
+        }
+    }
+
+    /**
+     * Custom task to send stock data to server
+     */
+    private class AsyncUpdateStock extends AsyncTask<String,String,String> {
+
+        private MaterialDialog materialDialog;
+        private ArrayList<StockItem> sendables;
+        private ClubMember clubMember;
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            for (int i = 0; i < sendables.size(); i++) {
+                publishProgress();
+                HashMap<String, String> pairs = new HashMap<>();
+                pairs.put("login", clubMember.getLogin());
+                pairs.put("password", clubMember.getPassword());
+                pairs.put("idstr", sendables.get(i).getId());
+                pairs.put("category", sendables.get(i).isQuantifiable() ? "elements" : "ingredients");
+                pairs.put("stock", String.valueOf(sendables.get(i).getStock()));
+                APIResponse response = APIUtils.postAPIData(Constants.API_STOCK_UPDATE, pairs, context);
+                if (!response.isValid()) {
+                    return response.getError();
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            clubMember = DataStore.getInstance().getClubMember();
+            sendables = new ArrayList<>();
+
+            // Found sendables items
+            for (int i=0;i<stockItems.size();i++) {
+
+                // If not a header, add it
+                if (!stockItems.get(i).isHeader()) {
+                    sendables.add(stockItems.get(i));
+                }
+            }
+
+            // Progress dialog
+            materialDialog = new MaterialDialog.Builder(context)
+                    .title("Mise à jour des stocks")
+                    .content("Veuillez patienter ...")
+                    .progress(false, sendables.size(), true)
+                    .cancelable(false)
+                    .show();
+        }
+
+        @Override
+        protected void onPostExecute(String response) {
+            materialDialog.hide();
+            if (response != null) Toast.makeText(context, "Erreur : " + response, Toast.LENGTH_SHORT).show();
+            else {
+                Toast.makeText(context, "Stocks synchronisés !", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            materialDialog.incrementProgress(1);
         }
     }
 
@@ -371,6 +453,28 @@ public class StockActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        if (hasChanged) {
+            new MaterialDialog.Builder(context)
+                    .title("Quitter ?")
+                    .content("Vos modifications n'ont pas été sauvegardées sur le serveur !")
+                    .positiveText("Quitter")
+                    .negativeText("Annuler")
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
+                            hasChanged = false;
+                            StockActivity.this.onBackPressed();
+                        }
+                    })
+                    .show();
+        } else {
+            super.onBackPressed();
+        }
     }
 
 }
