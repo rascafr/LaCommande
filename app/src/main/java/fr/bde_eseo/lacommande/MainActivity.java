@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
         new MaterialDialog.Builder(this)
                 .title("Quitter")
-                .content("Vous allez être déconnecté.\nN'oubliez pas de fermer la cafet depuis le menu \"Fermeture\" si c'est la fin de votre service.\n\nContinuer ?")
+                .content("Vous allez être déconnecté.\nN'oubliez pas de fermer la cafet depuis l'icône \"cadenas\" situé en haut à droite de l'écran si c'est la fin de votre service.\n\nContinuer ?")
                 .positiveText("Déconnexion")
                 .negativeText("Annuler")
                 .callback(new MaterialDialog.ButtonCallback() {
@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
                 // Dialog to confirm
                 MaterialDialog materialDialog = new MaterialDialog.Builder(context)
                         .title("Fermer la cafet")
-                        .content("Toutes les commandes en cours seront soit marquées comme terminées, soit marquées comme impayées.\nLes commandes n'ayant pas aboutit seront supprimées.\nN'effectuez cette action qu'à la fin de votre service (vers 13h15).")
+                        .content("Toutes les commandes en cours seront :\n - soit marquées comme terminées\n - soit marquées comme impayées\n\nLes commandes n'ayant pas abouti seront supprimées.\n\nN'effectuez cette action qu'à la fin de votre service (vers 13h15).")
                         .negativeText("Annuler")
                         .positiveText("Confirmer")
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
