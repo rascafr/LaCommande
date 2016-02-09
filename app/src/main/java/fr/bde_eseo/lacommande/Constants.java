@@ -31,9 +31,6 @@ public class Constants {
     public final static String URL_PLANNING_GET = URL_SERVER + "apps-lacommande/v10/getPlanning.php";
     public final static String URL_PLANNING_SYNC = URL_SERVER + "apps-lacommande/v10/syncPlanning.php";
 
-    // Orders List
-    public final static String URL_CURRENT_ORDERS_GET = URL_SERVER + "apps-lacommande/v10/getCurrentOrders.php";
-
     /**
      * API Urls
      */
