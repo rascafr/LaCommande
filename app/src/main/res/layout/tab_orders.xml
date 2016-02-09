@@ -10,6 +10,7 @@
         android:layout_alignParentTop="true"
         android:scrollbars="vertical"
         android:fadeScrollbars="true"
+        android:background="@color/back_recylist"
         android:layout_above="@+id/linearLayout"/>
 
     <ProgressBar

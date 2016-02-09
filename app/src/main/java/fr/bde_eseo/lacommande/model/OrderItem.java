@@ -13,7 +13,7 @@ import org.json.JSONObject;
 public class OrderItem {
     private String idstr, clientname, friendlyText, date, instructions, colorHtml, clientlogin;
     private int status, idmod, idcmd;
-    private boolean paidbefore, isHeader;
+    private boolean paidbefore, isHeader, paidlydia;
     private double price;
 
     public static final int ORDER_ITEM_PREPARING_UNPAID = 0;
@@ -27,6 +27,7 @@ public class OrderItem {
         this.idcmd = obj.getInt("idcmd");
         this.status = obj.getInt("status");
         this.paidbefore = obj.getInt("paidbefore") == 1;
+        this.paidlydia = obj.getInt("paidlydia") == 1;
         this.idstr = obj.getString("idstr");
         this.clientlogin = obj.getString("clientlogin");
         this.clientname = obj.getString("clientname");
@@ -70,7 +71,7 @@ public class OrderItem {
     }
 
     public String getPaidStatus() {
-        return this.paidbefore ? "Payée" : "Non payée";
+        return this.paidbefore ? this.paidlydia ? "Payée (Lydia)" : "Payée (Liquide)" : "Non payée";
     }
 
     public String getColorHtml() {

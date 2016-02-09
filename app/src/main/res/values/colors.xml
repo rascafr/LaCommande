@@ -13,6 +13,7 @@
     <color name="back_element">#e0f5e6</color>
     <color name="item_ingredient">#fe7c48</color>
     <color name="back_ingredient">#f9eae5</color>
+    <color name="back_recylist">@color/md_grey_200</color>
 
 
     <!-- google's material design colours from
