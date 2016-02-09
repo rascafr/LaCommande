@@ -1,5 +1,6 @@
 package fr.bde_eseo.lacommande.tabs;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
@@ -35,7 +36,11 @@ import java.util.HashMap;
 import fr.bde_eseo.lacommande.Constants;
 import fr.bde_eseo.lacommande.R;
 import fr.bde_eseo.lacommande.listeners.RecyclerItemClickListener;
+import fr.bde_eseo.lacommande.model.ClubMember;
+import fr.bde_eseo.lacommande.model.DataStore;
 import fr.bde_eseo.lacommande.model.OrderItem;
+import fr.bde_eseo.lacommande.utils.APIAsyncTask;
+import fr.bde_eseo.lacommande.utils.APIResponse;
 import fr.bde_eseo.lacommande.utils.ConnexionUtils;
 import fr.bde_eseo.lacommande.utils.EncryptUtils;
 import fr.bde_eseo.lacommande.utils.Utilities;
@@ -69,8 +74,13 @@ public class OrdersTab extends Fragment {
     private static String lastFetchedData = "";
     private long lastUpdate = 0;
 
+    // Android
+    private Context context;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        context = getActivity();
+
         View rootView = inflater.inflate(R.layout.tab_orders, container, false);
 
         // Create model
@@ -127,16 +137,16 @@ public class OrdersTab extends Fragment {
                             @Override
                             public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
                                 oi.setOrderFullStatus(OrderItem.ORDER_ITEM_READY_UNPAID);
-                                AsyncSetStatus asyncSetStatus = new AsyncSetStatus();
-                                asyncSetStatus.execute(oi);
+                                AsyncSetStatus asyncSetStatus = new AsyncSetStatus(context, oi);
+                                asyncSetStatus.execute(Constants.API_ORDER_UPDATE);
                             }
                         });
                         mdb.onNegative(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
                                 oi.setOrderFullStatus(OrderItem.ORDER_ITEM_PREPARING_PAID);
-                                AsyncSetStatus asyncSetStatus = new AsyncSetStatus();
-                                asyncSetStatus.execute(oi);
+                                AsyncSetStatus asyncSetStatus = new AsyncSetStatus(context, oi);
+                                asyncSetStatus.execute(Constants.API_ORDER_UPDATE);
                             }
                         });
                         break;
@@ -148,8 +158,8 @@ public class OrdersTab extends Fragment {
                             @Override
                             public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
                                 oi.setOrderFullStatus(OrderItem.ORDER_ITEM_DONE_PAID);
-                                AsyncSetStatus asyncSetStatus = new AsyncSetStatus();
-                                asyncSetStatus.execute(oi);
+                                AsyncSetStatus asyncSetStatus = new AsyncSetStatus(context, oi);
+                                asyncSetStatus.execute(Constants.API_ORDER_UPDATE);
                             }
                         });
                         break;
@@ -161,8 +171,8 @@ public class OrdersTab extends Fragment {
                             @Override
                             public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
                                 oi.setOrderFullStatus(OrderItem.ORDER_ITEM_READY_PAID);
-                                AsyncSetStatus asyncSetStatus = new AsyncSetStatus();
-                                asyncSetStatus.execute(oi);
+                                AsyncSetStatus asyncSetStatus = new AsyncSetStatus(context, oi);
+                                asyncSetStatus.execute(Constants.API_ORDER_UPDATE);
                             }
                         });
                         break;
@@ -174,8 +184,8 @@ public class OrdersTab extends Fragment {
                             @Override
                             public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
                                 oi.setOrderFullStatus(OrderItem.ORDER_ITEM_DONE_PAID);
-                                AsyncSetStatus asyncSetStatus = new AsyncSetStatus();
-                                asyncSetStatus.execute(oi);
+                                AsyncSetStatus asyncSetStatus = new AsyncSetStatus(context, oi);
+                                asyncSetStatus.execute(Constants.API_ORDER_UPDATE);
                             }
                         });
                         break;
@@ -433,14 +443,26 @@ public class OrdersTab extends Fragment {
     /**
      * Custom Async Task to set order status
      */
-    private class AsyncSetStatus extends AsyncTask<OrderItem, String, String> {
+    private class AsyncSetStatus extends APIAsyncTask {
 
         private MaterialDialog materialDialog;
+        private OrderItem orderItem;
+        private ClubMember clubMember;
+
+        public AsyncSetStatus(Context context, OrderItem orderItem) {
+            super(context);
+            this.orderItem = orderItem;
+            this.clubMember = DataStore.getInstance().getClubMember();
+            this.pairs.put("status", String.valueOf(this.orderItem.getOrderFullStatus()));
+            this.pairs.put("idcmd", String.valueOf(this.orderItem.getIdcmd()));
+            this.pairs.put("login", clubMember.getLogin());
+            this.pairs.put("password", clubMember.getPassword());
+        }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            materialDialog = new MaterialDialog.Builder(getActivity())
+            materialDialog = new MaterialDialog.Builder(context)
                     .title("Mise à jour")
                     .content("Veuillez patienter ...")
                     .progress(true, 0)
@@ -450,38 +472,19 @@ public class OrdersTab extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(String data) {
-            super.onPostExecute(data);
+        protected void onPostExecute(APIResponse apiResponse) {
             materialDialog.hide();
 
-            if (Utilities.isNetworkDataValid(data)) {
-                if (data.equals("1")) {
-                    Toast.makeText(getActivity(), "Commande synchronisée !", Toast.LENGTH_SHORT).show();
-                    mAdapter.notifyDataSetChanged();
+            if (apiResponse.isValid()) {
+                Toast.makeText(context, "Commande synchronisée !", Toast.LENGTH_SHORT).show();
+                mAdapter.notifyDataSetChanged();
 
-                    AsyncOrders asyncOrders = new AsyncOrders();
-                    asyncOrders.execute(Constants.URL_CURRENT_ORDERS_GET);
-                } else {
-                    Toast.makeText(getActivity(), "Erreur de synchronisation !", Toast.LENGTH_SHORT).show();
-                }
+                // Sync new data
+                AsyncOrders asyncOrders = new AsyncOrders();
+                asyncOrders.execute(Constants.URL_CURRENT_ORDERS_GET);
+
             } else{
-                Toast.makeText(getActivity(), "Erreur réseau", Toast.LENGTH_SHORT).show();
-            }
-        }
-
-        @Override
-        protected String doInBackground(OrderItem... params) {
-            HashMap<String, String> pairs = new HashMap<>();
-            pairs.put("status", "" + params[0].getOrderFullStatus());
-            pairs.put("idcmd", "" + params[0].getIdcmd());
-            pairs.put("cmd", "" + params[0].getIdstr() + " " + new DecimalFormat("000").format(params[0].getIdmod()));
-            pairs.put("login", "" + params[0].getClientlogin());
-            pairs.put("hash", EncryptUtils.sha256(pairs.get("status") + pairs.get("idcmd") + pairs.get("cmd") + pairs.get("login") + getResources().getString(R.string.salt_sync_order)));
-
-            if (Utilities.isOnline(getActivity())) {
-                return ConnexionUtils.postServerData(Constants.URL_CURRENT_ORDER_SYNC, pairs);
-            } else {
-                return null;
+                Toast.makeText(context, apiResponse.getError(), Toast.LENGTH_SHORT).show();
             }
         }
     }

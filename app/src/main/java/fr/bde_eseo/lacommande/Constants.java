@@ -33,13 +33,6 @@ public class Constants {
 
     // Orders List
     public final static String URL_CURRENT_ORDERS_GET = URL_SERVER + "apps-lacommande/v10/getCurrentOrders.php";
-    public final static String URL_CURRENT_ORDER_SYNC = URL_SERVER + "apps-lacommande/v10/syncCurrentOrder.php";
-
-    // Cafeteria Data
-    public final static String URL_DATA_GET = URL_SERVER + "apps-lacommande/v10/syncData.php";
-
-    // Cart synchronization
-    public final static String URL_CART_SYNC = URL_SERVER + "apps-lacommande/v10/syncOrder-token.php";
 
     /**
      * API Urls
@@ -63,6 +56,7 @@ public class Constants {
     public final static String API_ORDER_ITEMS = URL_API + "order/items.php";
     public final static String API_ORDER_SEND = URL_API + "order/send.php";
     public final static String API_ORDER_LOCK = URL_API + "order/lock.php";
+    public final static String API_ORDER_UPDATE = URL_API + "order/update.php";
 
     // Parameters
     public final static String API_PARAMETERS_LIST = URL_API + "parameters/list.php";
