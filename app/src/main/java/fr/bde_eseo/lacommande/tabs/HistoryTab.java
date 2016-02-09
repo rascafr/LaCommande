@@ -7,14 +7,17 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -185,6 +188,7 @@ public class HistoryTab extends Fragment {
 
         private final static int TYPE_ITEM = 0;
         private final static int TYPE_HEADER = 1;
+        private final static int TYPE_HEADER_TOP = 2;
 
         @Override
         public int getItemCount() {
@@ -204,7 +208,7 @@ public class HistoryTab extends Fragment {
                 hvh.vData.setText(Html.fromHtml(oi.getFriendlyText()));
                 hvh.vDate.setText(oi.getDate());
                 ((GradientDrawable) hvh.vColor.getBackground()).setColor(Color.parseColor(oi.getColorHtml()));
-            } else {
+            } else if (type == TYPE_HEADER || type == TYPE_HEADER_TOP) {
                 HistoryHeaderViewHolder hhvh = (HistoryHeaderViewHolder) viewHolder;
                 hhvh.vHeader.setText(oi.getFriendlyText());
             }
@@ -212,7 +216,7 @@ public class HistoryTab extends Fragment {
 
         @Override
         public int getItemViewType(int position) {
-            return orderItems == null ? TYPE_ITEM : (orderItems.get(position).isHeader() ? TYPE_HEADER : TYPE_ITEM);
+            return orderItems == null ? TYPE_ITEM : (orderItems.get(position).isHeader() ? position == 0 ? TYPE_HEADER_TOP : TYPE_HEADER : TYPE_ITEM);
         }
 
         @Override
@@ -220,8 +224,10 @@ public class HistoryTab extends Fragment {
 
             if (viewType == TYPE_ITEM)
                 return new HistoryViewHolder(LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_history, viewGroup, false));
-            else
+            else if (viewType == TYPE_HEADER)
                 return new HistoryHeaderViewHolder(LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_header_history, viewGroup, false));
+            else
+                return new HistoryHeaderViewHolder(LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_header_history_top, viewGroup, false));
         }
 
         // Classic View Holder for history item
