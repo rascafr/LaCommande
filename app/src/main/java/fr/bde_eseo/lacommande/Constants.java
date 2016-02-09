@@ -2,13 +2,12 @@ package fr.bde_eseo.lacommande;
 
 /**
  * Created by Rascafr on 20/10/2015.
+ * Contient les définitions statiques suivantes :
+ * - URL de l'API serveur
+ * - Clefs Intents
+ * - Clef Preferences
  */
 public class Constants {
-
-    /**
-     * Intent keys
-     */
-    public static final String KEY_NEW_ORDER_CLIENT = "intent.clientlistactivity.clientname";
 
     /**
      * URL LIST
@@ -61,11 +60,15 @@ public class Constants {
     public final static String API_STOCK_UPDATE = URL_API + "stock/update.php";
 
     /**
+     * Intent keys
+     */
+    public static final String KEY_NEW_ORDER_CLIENT = "intent.clientlistactivity.clientname";
+
+    /**
      * Preferences
      */
     public final static String PREFS_IDENTIFIER = "fr.bde_eseo.lacommande.prefs";
     public final static String PREFS_KEY_LOGIN = "key.login";
     public final static String PREFS_KEY_PASSWORD = "key.password";
-
 
 }
