@@ -8,6 +8,7 @@
     <string name="activity_order">Nouvelle commande</string>
 
     <string name="menu_exit">Quitter</string>
+    <string name="menu_lock">Fermer la cafet</string>
     <string name="menu_help">Aide</string>
 
     <!-- Sliding tabs Strings -->

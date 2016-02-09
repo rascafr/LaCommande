@@ -62,6 +62,7 @@ public class Constants {
     public final static String API_ORDER_PREPARE = URL_API + "order/prepare.php";
     public final static String API_ORDER_ITEMS = URL_API + "order/items.php";
     public final static String API_ORDER_SEND = URL_API + "order/send.php";
+    public final static String API_ORDER_LOCK = URL_API + "order/lock.php";
 
     // Parameters
     public final static String API_PARAMETERS_LIST = URL_API + "parameters/list.php";

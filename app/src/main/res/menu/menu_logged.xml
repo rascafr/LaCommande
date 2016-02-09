@@ -1,6 +1,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:app="http://schemas.android.com/apk/res-auto"
-      xmlns:tools="http://schemas.android.com/tools">
+      xmlns:app="http://schemas.android.com/apk/res-auto" >
 
     <item
         android:id="@+id/action_help"
@@ -8,6 +7,14 @@
         android:title="@string/menu_help"
         app:showAsAction="ifRoom"
         />
+
+    <item
+        android:id="@+id/action_lock"
+        android:icon="@drawable/ic_lock"
+        android:title="@string/menu_lock"
+        app:showAsAction="ifRoom"
+        />
+
 
     <item
         android:id="@+id/action_exit"
