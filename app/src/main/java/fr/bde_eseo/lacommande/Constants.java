@@ -6,11 +6,6 @@ package fr.bde_eseo.lacommande;
 public class Constants {
 
     /**
-     * General
-     */
-    public static final String APP_VERSION = "1.0";
-
-    /**
      * Intent keys
      */
     public static final String KEY_NEW_ORDER_CLIENT = "intent.clientlistactivity.clientname";
@@ -21,9 +16,6 @@ public class Constants {
 
     // Server
     public final static String URL_SERVER = "http://217.199.187.59/francoisle.fr/lacommande/";
-
-    // Connecting
-    //public final static String URL_LOGIN_CLUB = URL_SERVER + "apps-lacommande/v10/connectClub.php";
 
     // Admin
     public final static String URL_CLUBS_LISTS = URL_SERVER + "apps-lacommande/v10/getClubList.php";
