@@ -76,6 +76,7 @@
     <string name="history_pages">Page : </string>
     <string name="order_load">Mise à jour des données ...</string>
     <string name="no_order">Aucune commande en cours.\nVous pouvez vous reposer !</string>
+    <string name="no_unpaid">Aucune commande impayée n\'a été trouvée.</string>
 
     <!-- Random Strings for Password generation -->
     <string-array name="password_samples">

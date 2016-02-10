@@ -7,24 +7,20 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -43,7 +39,7 @@ public class HistoryTab extends Fragment {
 
     // Layout UI Objects
     private RecyclerView recyList;
-    private TrackHistoryAdapter mAdapter;
+    private HistoryAdapter mAdapter;
     private ProgressBar progress;
     private TextView tvPage;
     private ImageView actionStart, actionPrevious, actionNext, actionEnd;
@@ -70,7 +66,7 @@ public class HistoryTab extends Fragment {
 
         // Assign UI layout
         orderItems = new ArrayList<>();
-        mAdapter = new TrackHistoryAdapter();
+        mAdapter = new HistoryAdapter();
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.history_refresh);
         swipeRefreshLayout.setColorSchemeColors(R.color.colorPrimary);
         disabler = new RecyclerViewDisabler();
@@ -184,7 +180,7 @@ public class HistoryTab extends Fragment {
 
 
     // Simple adapter for history
-    public class TrackHistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    public class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         private final static int TYPE_ITEM = 0;
         private final static int TYPE_HEADER = 1;
