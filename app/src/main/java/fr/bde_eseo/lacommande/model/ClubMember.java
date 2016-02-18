@@ -1,12 +1,7 @@
 package fr.bde_eseo.lacommande.model;
 
-import android.content.Context;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import fr.bde_eseo.lacommande.R;
-import fr.bde_eseo.lacommande.utils.EncryptUtils;
 
 /**
  * Created by Rascafr on 24/10/2015.

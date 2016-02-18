@@ -1,12 +1,9 @@
 package fr.bde_eseo.lacommande.tabs;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,28 +14,14 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 
 import fr.bde_eseo.lacommande.BuildConfig;
 import fr.bde_eseo.lacommande.ClientListActivity;
-import fr.bde_eseo.lacommande.Constants;
-import fr.bde_eseo.lacommande.OrderGenericActivity;
 import fr.bde_eseo.lacommande.R;
 import fr.bde_eseo.lacommande.async.AsyncToken;
 import fr.bde_eseo.lacommande.model.ClientItem;
 import fr.bde_eseo.lacommande.model.DataStore;
-import fr.bde_eseo.lacommande.utils.APIResponse;
-import fr.bde_eseo.lacommande.utils.APIUtils;
-import fr.bde_eseo.lacommande.utils.ConnexionUtils;
-import fr.bde_eseo.lacommande.utils.EncryptUtils;
-import fr.bde_eseo.lacommande.utils.Utilities;
 
 /**
  * Created by Rascafr on 11/11/2015.

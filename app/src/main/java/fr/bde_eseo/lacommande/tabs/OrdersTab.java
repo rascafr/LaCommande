@@ -3,17 +3,13 @@ package fr.bde_eseo.lacommande.tabs;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,11 +23,9 @@ import com.afollestad.materialdialogs.MaterialDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import fr.bde_eseo.lacommande.Constants;
 import fr.bde_eseo.lacommande.R;
@@ -41,9 +35,6 @@ import fr.bde_eseo.lacommande.model.DataStore;
 import fr.bde_eseo.lacommande.model.OrderItem;
 import fr.bde_eseo.lacommande.utils.APIAsyncTask;
 import fr.bde_eseo.lacommande.utils.APIResponse;
-import fr.bde_eseo.lacommande.utils.ConnexionUtils;
-import fr.bde_eseo.lacommande.utils.EncryptUtils;
-import fr.bde_eseo.lacommande.utils.Utilities;
 
 /**
  * Created by Rascafr on 29/10/2015.

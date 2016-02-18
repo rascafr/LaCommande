@@ -3,7 +3,6 @@ package fr.bde_eseo.lacommande.tabs;
 import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,7 +15,6 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-import fr.bde_eseo.lacommande.MainActivity;
 import fr.bde_eseo.lacommande.R;
 import fr.bde_eseo.lacommande.admin.ClubListActivity;
 import fr.bde_eseo.lacommande.admin.ParametersAsyncDialog;

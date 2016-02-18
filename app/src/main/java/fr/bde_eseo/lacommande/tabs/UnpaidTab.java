@@ -1,10 +1,8 @@
 package fr.bde_eseo.lacommande.tabs;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -15,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,22 +25,15 @@ import org.json.JSONException;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import fr.bde_eseo.lacommande.Constants;
 import fr.bde_eseo.lacommande.R;
-import fr.bde_eseo.lacommande.admin.ClubListActivity;
-import fr.bde_eseo.lacommande.admin.ParametersAsyncDialog;
-import fr.bde_eseo.lacommande.admin.PlanningActivity;
-import fr.bde_eseo.lacommande.admin.ServiceAsyncDialog;
-import fr.bde_eseo.lacommande.admin.StockActivity;
 import fr.bde_eseo.lacommande.listeners.RecyclerItemClickListener;
 import fr.bde_eseo.lacommande.model.ClubMember;
 import fr.bde_eseo.lacommande.model.DataStore;
 import fr.bde_eseo.lacommande.model.OrderItem;
 import fr.bde_eseo.lacommande.utils.APIAsyncTask;
 import fr.bde_eseo.lacommande.utils.APIResponse;
-import fr.bde_eseo.lacommande.utils.APIUtils;
 
 /**
  * Created by Rascafr on 11/11/2015.

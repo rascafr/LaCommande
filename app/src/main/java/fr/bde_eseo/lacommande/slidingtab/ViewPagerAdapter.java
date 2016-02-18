@@ -6,10 +6,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import fr.bde_eseo.lacommande.tabs.AdminTab;
-import fr.bde_eseo.lacommande.tabs.UnpaidTab;
 import fr.bde_eseo.lacommande.tabs.HistoryTab;
 import fr.bde_eseo.lacommande.tabs.NewTab;
 import fr.bde_eseo.lacommande.tabs.OrdersTab;
+import fr.bde_eseo.lacommande.tabs.UnpaidTab;
 
 
 public class ViewPagerAdapter extends FragmentStatePagerAdapter {

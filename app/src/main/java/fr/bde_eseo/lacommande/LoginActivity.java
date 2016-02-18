@@ -14,14 +14,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.MaterialDialog;
-
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -30,7 +25,6 @@ import fr.bde_eseo.lacommande.model.ClubMember;
 import fr.bde_eseo.lacommande.model.DataStore;
 import fr.bde_eseo.lacommande.utils.APIResponse;
 import fr.bde_eseo.lacommande.utils.APIUtils;
-import fr.bde_eseo.lacommande.utils.ConnexionUtils;
 import fr.bde_eseo.lacommande.utils.EncryptUtils;
 import fr.bde_eseo.lacommande.utils.Utilities;
 

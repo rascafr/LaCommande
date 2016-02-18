@@ -1,7 +1,5 @@
 package fr.bde_eseo.lacommande.model;
 
-import java.text.DecimalFormat;
-
 /**
  * Created by Rascafr on 12/11/2015.
  */

@@ -13,7 +13,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -28,7 +27,6 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
-import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

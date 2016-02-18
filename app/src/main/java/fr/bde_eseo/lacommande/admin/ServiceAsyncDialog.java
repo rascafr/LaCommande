@@ -5,17 +5,14 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.text.InputType;
 import android.util.Base64;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import fr.bde_eseo.lacommande.Constants;

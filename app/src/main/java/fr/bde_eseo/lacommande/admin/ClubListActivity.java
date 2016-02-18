@@ -36,8 +36,8 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import fr.bde_eseo.lacommande.Constants;
-import fr.bde_eseo.lacommande.model.DataStore;
 import fr.bde_eseo.lacommande.R;
+import fr.bde_eseo.lacommande.model.DataStore;
 import fr.bde_eseo.lacommande.utils.ConnexionUtils;
 import fr.bde_eseo.lacommande.utils.EncryptUtils;
 import fr.bde_eseo.lacommande.utils.Utilities;

@@ -19,19 +19,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.melnykov.fab.FloatingActionButton;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -40,8 +36,6 @@ import fr.bde_eseo.lacommande.model.ClientItem;
 import fr.bde_eseo.lacommande.model.DataStore;
 import fr.bde_eseo.lacommande.utils.APIResponse;
 import fr.bde_eseo.lacommande.utils.APIUtils;
-import fr.bde_eseo.lacommande.utils.ConnexionUtils;
-import fr.bde_eseo.lacommande.utils.Utilities;
 
 /**
  * Created by Rascafr on 11/11/2015.
@@ -77,10 +71,6 @@ public class ClientListActivity extends AppCompatActivity {
         // Set UI Main Layout
         setContentView(R.layout.activity_clients);
 
-        // Arrow back to main activity
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Test");
-
         // Get objects
         progressClient = (ProgressBar) findViewById(R.id.progressClients);
         recyList = (RecyclerView) findViewById(R.id.recyList);
@@ -93,8 +83,8 @@ public class ClientListActivity extends AppCompatActivity {
         // Assign text input to toolbar
         ActionBar actionBar = getSupportActionBar();
         actionBar.setCustomView(R.layout.toolbar_search);
-        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM
-                | ActionBar.DISPLAY_SHOW_HOME);
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
+        actionBar.setDisplayHomeAsUpEnabled(true); // Arrow back to main activity
         View actionBarView = actionBar.getCustomView();
         etSearch = (EditText) actionBarView.findViewById(R.id.etToolbar);
         imgClear = (ImageView) actionBarView.findViewById(R.id.crossClear);

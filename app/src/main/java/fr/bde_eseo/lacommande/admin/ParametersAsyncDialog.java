@@ -3,10 +3,8 @@ package fr.bde_eseo.lacommande.admin;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.util.Log;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import org.json.JSONArray;
