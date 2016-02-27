@@ -9,6 +9,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +43,7 @@ import fr.bde_eseo.lacommande.utils.Utilities;
 
 /**
  * Created by Rascafr on 11/11/2015.
+ * Version basique de l'interface et du comportement
  */
 public class OrderGenericActivity extends AppCompatActivity {
 
@@ -69,7 +71,6 @@ public class OrderGenericActivity extends AppCompatActivity {
     private Button buttonCancel;
 
     // Others
-    private int selectedItem = 0;
     private int currentMode = MODE_NAVIGATE;
     private String clientName;
     private Context context;
@@ -184,6 +185,8 @@ public class OrderGenericActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                debugInfo();
+
                 // Check cart is not empty
                 if (cartItems.size() == 0) {
                     new MaterialDialog.Builder(context)
@@ -251,31 +254,61 @@ public class OrderGenericActivity extends AppCompatActivity {
             }
         });
 
+        /**
+         * Action sur annulation (bouton annuler)
+         *
+         * - Si sur choix des éléments d'un menu : annuler = suppression du menu en cours
+         * - Si sur choix des ingrédients d'un élément : annuler = suppression de l'élément en cours
+         *
+         * Dans tous les cas : retour en mode navigation, affichage de la catégorie 0
+         */
         buttonCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                debugInfo();
+
                 switch (currentMode) {
 
-                    // If mode is Primary, end it, delete item
+                    // If mode is Primary, end it, delete parent item (menu
                     case MODE_ELEMENTS_PRIMARY:
-                        currentMode = MODE_NAVIGATE;
-                        setHelperText("Sélectionnez une catégorie, puis ajoutez un menu ou un élément");
-                        //DataStore.getInstance().getCartItems().remove();
+                    // If mode is Secondary, end it, delete parent item (menu)
+                    case MODE_ELEMENTS_SECONDARY:
+
+                        if (selectedMenu != null) {
+                            Toast.makeText(context, selectedMenu.getName() + " supprimé du panier", Toast.LENGTH_SHORT).show();
+                            DataStore.getInstance().getCartItems().remove(selectedMenu);
+                            selectedMenu = null;
+                        }
+
                         break;
 
-                    // If mode is Secondary, end it, delete item
-                    case MODE_ELEMENTS_SECONDARY:
-                        currentMode = MODE_NAVIGATE;
-                        setHelperText("Sélectionnez une catégorie, puis ajoutez un menu ou un élément");
+                    // If mode is ingredients, delete parent item
+                    // If parent's parent is menu, delete it
+                    case MODE_INGREDIENTS:
+                        if (selectedMenu != null) {
+                            Toast.makeText(context, selectedMenu.getName() + " supprimé du panier", Toast.LENGTH_SHORT).show();
+                            DataStore.getInstance().getCartItems().remove(selectedMenu);
+                            selectedMenu = null;
+                        } else {
+                            if (selectedElement != null) {
+                                Toast.makeText(context, selectedElement.getName() + " supprimé du panier", Toast.LENGTH_SHORT).show();
+                                DataStore.getInstance().getCartItems().remove(selectedElement);
+                            }
+                        }
+                        selectedElement = null;
                         break;
 
                 }
 
                 // Update data
-                updateButtonProperties();
-                updateDisplayArray(0);
-                categoryAdapter.notifyDataSetChanged();
+                currentMode = MODE_NAVIGATE;
+                setHelperText("Sélectionnez une catégorie, puis ajoutez un menu ou un élément");
+
+                updateButtonProperties(); // update buttons
+                updateDisplayArray(0);    // update display
+                categoryAdapter.setSelectedCategory(0); // update category view, first category is selected
+                updateCartArray(); // update cart view
             }
         });
     }
@@ -373,6 +406,9 @@ public class OrderGenericActivity extends AppCompatActivity {
 
     private class CategoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+        // current selected category
+        private int selectedCategory = 0;
+
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             return new CategoryHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.card_category, parent, false));
@@ -383,7 +419,7 @@ public class OrderGenericActivity extends AppCompatActivity {
             CategoryHolder ch = (CategoryHolder) holder;
             CategoryItem ci = DataStore.getInstance().getCategoryItems().get(position);
             ch.tvTitle.setText(ci.getName());
-            if (selectedItem == position) {
+            if (selectedCategory == position) {
                 ch.cardView.setCardBackgroundColor(getResources().getColor(R.color.md_orange_200));
             } else {
                 if (currentMode == MODE_NAVIGATE) ch.cardView.setCardBackgroundColor(getResources().getColor(R.color.md_blue_grey_50));
@@ -396,12 +432,17 @@ public class OrderGenericActivity extends AppCompatActivity {
 
                     // Il n'est possible de changer la catégorie qu'en mode navigation
                     if (currentMode == MODE_NAVIGATE) {
-                        selectedItem = position;
+                        selectedCategory = position;
                         categoryAdapter.notifyDataSetChanged();
-                        updateDisplayArray(selectedItem);
+                        updateDisplayArray(selectedCategory);
                     }
                 }
             });
+        }
+
+        public void setSelectedCategory(int selectedCategory) {
+            this.selectedCategory = selectedCategory;
+            this.notifyDataSetChanged();
         }
 
         @Override
@@ -493,7 +534,7 @@ public class OrderGenericActivity extends AppCompatActivity {
 
             if (Utilities.isNetworkDataValid(data)) {
                 DataStore.getInstance().setCafetData(data);
-                updateDisplayArray(selectedItem);
+                updateDisplayArray(0);
             } else {
                 Toast.makeText(OrderGenericActivity.this, "Erreur réseau", Toast.LENGTH_SHORT).show();
             }
@@ -677,6 +718,8 @@ public class OrderGenericActivity extends AppCompatActivity {
     // Decide about what a display item touch does
     void actionDisplayTouch(DisplayItem displayItem, RootItem linkItem) {
 
+        debugInfo();
+
         switch (linkItem.getType()) {
 
             // It's a menu ?
@@ -834,6 +877,8 @@ public class OrderGenericActivity extends AppCompatActivity {
                 }
                 break;
         }
+
+        debugInfo();
     }
 
     // Search for an element in a sub item
@@ -892,5 +937,33 @@ public class OrderGenericActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        new MaterialDialog.Builder(context)
+                .title("Annuler la commande ?")
+                .content("Le contenu du panier sera supprimé.\nContinuer ?")
+                .positiveText("Oui")
+                .negativeText("Annuler")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
+                        OrderGenericActivity.this.finish();
+                    }
+                })
+                .show();
+    }
+
+    /**
+     * Debug
+     */
+    private void debugInfo() {
+        String s = "";
+        if (currentMode == 0) s = "MODE_NAVIGATE";
+        else if (currentMode == 1) s = "MODE_INGREDIENTS";
+        else if (currentMode == 2) s = "MODE_ELEMENTS_PRIMARY";
+        else if (currentMode == 3) s = "MODE_ELEMENTS_SECONDARY)";
+        Log.d("DEBUG", ", currentMode="+s);
     }
 }
