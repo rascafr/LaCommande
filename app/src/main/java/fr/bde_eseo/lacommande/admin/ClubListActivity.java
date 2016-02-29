@@ -138,7 +138,10 @@ public class ClubListActivity extends AppCompatActivity {
                                                     EncryptUtils.sha256(etAddPassword.getText().toString() + getResources().getString(R.string.salt_password)),
                                                     "0000-00-00 00:00:00",
                                                     checkAddEnabled.isChecked(),
-                                                    checkAddAdmin.isChecked() ? 1 : 0
+                                                    checkAddAdmin.isChecked() ? 1 : 0,
+                                                    null,
+                                                    "",
+                                                    0
                                             )
                                     );
 
@@ -460,9 +463,9 @@ public class ClubListActivity extends AppCompatActivity {
      * Custom definition to handle club model
      */
     private class ClubItem {
-        private String name, login, password, lastconnect;
+        private String name, login, password, lastconnect, img, sellevent;
         private boolean isHeader, enabled;
-        private int level;
+        private int level, num;
 
         // For header
         public ClubItem(String name) {
@@ -471,7 +474,7 @@ public class ClubListActivity extends AppCompatActivity {
         }
 
         // For club item
-        public ClubItem(String name, String login, String password, String lastconnect, boolean enabled, int level) {
+        public ClubItem(String name, String login, String password, String lastconnect, boolean enabled, int level, String sellevent, String img, int num) {
             this.name = name;
             this.login = login;
             this.password = password;
@@ -479,6 +482,9 @@ public class ClubListActivity extends AppCompatActivity {
             this.enabled = enabled;
             this.level = level;
             this.isHeader = false;
+            this.sellevent = sellevent;
+            this.img = img;
+            this.num = num;
         }
 
         // For club item with JSON data
@@ -489,7 +495,10 @@ public class ClubListActivity extends AppCompatActivity {
                     obj.getString("password"),
                     obj.getString("lastconnect"),
                     obj.getInt("enabled") == 1,
-                    obj.getInt("level")
+                    obj.getInt("level"),
+                    obj.getString("sellevent"),
+                    obj.getString("image"),
+                    obj.getInt("num")
             );
         }
 
@@ -560,7 +569,10 @@ public class ClubListActivity extends AppCompatActivity {
             json += "\"name\":\"" + this.name + "\",";
             json += "\"lastconnect\":\"" + this.lastconnect + "\",";
             json += "\"enabled\":\"" + (this.enabled ? 1:0) + "\",";
-            json += "\"level\":\"" + this.level + "\"";
+            json += "\"level\":\"" + this.level + "\",";
+            json += "\"sellevent\":\"" + this.sellevent + "\",";
+            json += "\"image\":\"" + this.img + "\",";
+            json += "\"num\":\"" + this.num + "\"";
             json += "}";
 
             return json;
