@@ -14,6 +14,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -59,10 +61,16 @@ public class HistoryTab extends Fragment {
     // Progress circle visibility flag
     private static boolean firstSync;
 
+    // Animation
+    private Animation anim;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.tab_history, container, false);
         context = getActivity();
+
+        // Animation for navigation buttons
+        anim = AnimationUtils.loadAnimation(context, R.anim.scale_button);
 
         // Assign UI layout
         orderItems = new ArrayList<>();
@@ -93,6 +101,7 @@ public class HistoryTab extends Fragment {
         actionStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                actionStart.startAnimation(anim);
                 if (currentPage > 0) {
                     currentPage = 0;
                     AsyncHistory asyncHistory = new AsyncHistory();
@@ -107,6 +116,7 @@ public class HistoryTab extends Fragment {
         actionPrevious.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                actionPrevious.startAnimation(anim);
                 if (currentPage > 0) {
                     currentPage--;
                     AsyncHistory asyncHistory = new AsyncHistory();
@@ -121,6 +131,7 @@ public class HistoryTab extends Fragment {
         actionNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                actionNext.startAnimation(anim);
                 if (currentPage < nbPages) {
                     currentPage++;
                     AsyncHistory asyncHistory = new AsyncHistory();
@@ -135,6 +146,7 @@ public class HistoryTab extends Fragment {
         actionEnd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                actionEnd.startAnimation(anim);
                 if (currentPage < nbPages) {
                     currentPage = nbPages;
                     AsyncHistory asyncHistory = new AsyncHistory();

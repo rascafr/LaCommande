@@ -32,7 +32,7 @@
 
     <!-- Login Activity Strings -->
     <string name="login_hint">Login du club</string>
-    <string name="password_hint">••••••••</string>
+    <string name="password_hint">Mot de passe</string>
     <string name="login_instructions">Identification nécessaire</string>
     <string name="login_instructions_2">Entrez le login et mot de passe\nqui vous ont été communiqués.</string>
     <string name="login_button">CONNEXION</string>

@@ -45,7 +45,7 @@ card_view:cardPreventCornerOverlap="false" >
 
         <TextView
             android:id="@+id/historyClient"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:singleLine="true"
             android:maxLines="1"
@@ -54,8 +54,11 @@ card_view:cardPreventCornerOverlap="false" >
 
         <TextView
             android:id="@+id/historyDate"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:text="12/12/2016" />
 
     </LinearLayout>
