@@ -621,7 +621,28 @@ public class OrderGenericActivity extends AppCompatActivity {
                 categoryAdapter.setSelectedCategory(0); // update category view, first category is selected
                 updateCartArray(); // update cart view
             } else {
-                Toast.makeText(OrderGenericActivity.this, "Erreur réseau", Toast.LENGTH_SHORT).show();
+                new MaterialDialog.Builder(context)
+                        .title("Erreur réseau")
+                        .content("Que souhaitez-vous faire ?")
+                        .negativeText("Annuler la commande")
+                        .positiveText("Réessayer")
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                        @Override
+                                        public void onClick(MaterialDialog dialog, DialogAction which) {
+                                            // Download data from server
+                                            AsyncData asyncData = new AsyncData();
+                                            asyncData.execute(Constants.API_ORDER_ITEMS);
+                                        }
+                                    }
+                        )
+                        .onNegative(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(MaterialDialog dialog, DialogAction which) {
+                                OrderGenericActivity.this.finish();
+                            }
+                        })
+                        .cancelable(false)
+                        .show();
             }
         }
     }

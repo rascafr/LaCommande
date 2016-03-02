@@ -70,27 +70,29 @@ public class LoginActivity extends AppCompatActivity {
         String lastLogin = prefs.getString(Constants.PREFS_KEY_LOGIN, "");
         if (lastLogin.length() > 0) {
             etLogin.setText(lastLogin);
-            //etPassword.requestFocus();
+            etPassword.requestFocus();
 
-            // Login auto (debug) pour gagner du temps
-            String lastPwd = prefs.getString(Constants.PREFS_KEY_PASSWORD, "");
-            if (lastPwd.length() > 0) {
-                etPassword.setText(lastPwd);
+            if (Constants.debug) {
+                // Login auto (debug) pour gagner du temps
+                String lastPwd = prefs.getString(Constants.PREFS_KEY_PASSWORD, "");
+                if (lastPwd.length() > 0) {
+                    etPassword.setText(lastPwd);
 
-                tvProgress.setText("Préparation ... ");
-                tvProgress.setVisibility(View.VISIBLE);
-                progressConnect.setVisibility(View.VISIBLE);
-                Utilities.hideSoftKeyboard(LoginActivity.this);
+                    tvProgress.setText("Préparation ... ");
+                    tvProgress.setVisibility(View.VISIBLE);
+                    progressConnect.setVisibility(View.VISIBLE);
+                    Utilities.hideSoftKeyboard(LoginActivity.this);
 
-                new Handler().postDelayed(
-                        new Runnable() {
+                    new Handler().postDelayed(
+                            new Runnable() {
 
-                            @Override
-                            public void run() {
-                                AsyncConnectClub asyncConnectClub = new AsyncConnectClub();
-                                asyncConnectClub.execute();
-                            }
-                        }, 600);
+                                @Override
+                                public void run() {
+                                    AsyncConnectClub asyncConnectClub = new AsyncConnectClub();
+                                    asyncConnectClub.execute();
+                                }
+                            }, 600);
+                }
             }
         }
 
@@ -222,8 +224,6 @@ public class LoginActivity extends AppCompatActivity {
                     DataStore.getInstance().sortClientArray();
 
                     // Finish connexion
-                    Toast.makeText(LoginActivity.this, "Bienvenue, " +
-                            DataStore.getInstance().getClubMember().getName() + " !", Toast.LENGTH_SHORT).show();
                     Intent myIntent = new Intent(LoginActivity.this, MainActivity.class);
                     LoginActivity.this.startActivity(myIntent);
                     LoginActivity.this.finish();

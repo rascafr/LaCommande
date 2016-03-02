@@ -10,6 +10,11 @@ package fr.bde_eseo.lacommande;
 public class Constants {
 
     /**
+     * Dev utils
+     */
+    public final static boolean debug = false;
+
+    /**
      * API Urls
      */
 

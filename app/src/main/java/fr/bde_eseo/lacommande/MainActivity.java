@@ -52,6 +52,28 @@ public class MainActivity extends AppCompatActivity {
         mTabs.setDistributeEvenly(true);
         mTabs.setViewPager(mPager);
 
+        // Say hello
+        new MaterialDialog.Builder(context)
+                .title("Bienvenue, " + DataStore.getInstance().getClubMember().getName() + " !")
+                .content("Vous allez commencer votre service. Si c'est votre première cafet avec l'application LaCommande, nous vous conseillons de lire l'aide avant.")
+                .positiveText("Fermer")
+                .negativeText("Lire l'aide")
+                .cancelable(true)
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(MaterialDialog dialog, DialogAction which) {
+                        dialog.hide();
+                    }
+                })
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(MaterialDialog dialog, DialogAction which) {
+                        Intent i = new Intent(context, HelpActivity.class);
+                        startActivity(i);
+                    }
+                })
+                .show();
+
     }
 
     @Override
