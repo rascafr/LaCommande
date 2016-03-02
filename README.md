@@ -12,6 +12,4 @@ Note : Ceci est le dépôt utilisé en ce moment (phase de tests + release)
 
 Restant :
 - Menus & Éléments (modification, changement des prix) → moins urgent
-- Vue de commande : mieux gérer la machine à états, corriger les bugs → pour la rentrée absolument
-- Aide intégrée → idem, pour la rentrée absolument
-- Utilisation de l'API PHP pour la gestion planning et clubs
+- Aide intégrée → l'aide HTML est en cours de rédaction, passage sur le serveur ?
