@@ -58,6 +58,9 @@ public class Constants {
     public final static String API_CLUBS_LIST = URL_API + "club/list.php";
     public final static String API_CLUBS_SYNC = URL_API + "club/update.php";
 
+    // Help
+    public final static String API_HELP_GET = URL_API + "help/help.html";
+
     /**
      * Intent keys
      */
