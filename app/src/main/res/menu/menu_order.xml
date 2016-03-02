@@ -2,6 +2,13 @@
       xmlns:app="http://schemas.android.com/apk/res-auto" >
 
     <item
+        android:id="@+id/action_help"
+        android:icon="@drawable/ic_help"
+        android:title="@string/menu_help"
+        app:showAsAction="ifRoom"
+        />
+
+    <item
         android:id="@+id/action_clean"
         android:icon="@drawable/ic_trash"
         android:title="@string/menu_clean"

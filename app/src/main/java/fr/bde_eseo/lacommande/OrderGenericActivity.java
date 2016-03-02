@@ -1,6 +1,7 @@
 package fr.bde_eseo.lacommande;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -1012,6 +1013,7 @@ public class OrderGenericActivity extends AppCompatActivity {
 
             case MODE_NAVIGATE:
                 buttonValid.setText("Envoyer");
+                buttonValid.setBackground(getResources().getDrawable(R.drawable.flat_stack_button));
                 buttonValid.setVisibility(View.VISIBLE);
                 buttonCancel.setVisibility(View.GONE);
                 break;
@@ -1035,6 +1037,7 @@ public class OrderGenericActivity extends AppCompatActivity {
             case MODE_INGREDIENTS:
                 buttonValid.setText("Valider");
                 buttonValid.setVisibility(View.VISIBLE);
+                buttonValid.setBackground(getResources().getDrawable(R.drawable.flat_stack_button_green));
                 buttonCancel.setText("Annuler");
                 buttonCancel.setVisibility(View.VISIBLE);
                 break;
@@ -1058,6 +1061,14 @@ public class OrderGenericActivity extends AppCompatActivity {
             case android.R.id.home:
                 OrderGenericActivity.this.onBackPressed();
                 return true;
+
+            // respond to help action
+            case R.id.action_help:
+
+                Intent i = new Intent(context, HelpActivity.class);
+                startActivity(i);
+
+                break;
 
             // Respond to the clean cart action
             case R.id.action_clean:

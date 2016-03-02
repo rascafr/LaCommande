@@ -36,7 +36,7 @@
     <string name="login_instructions">Identification nécessaire</string>
     <string name="login_instructions_2">Entrez le login et mot de passe\nqui vous ont été communiqués.</string>
     <string name="login_button">CONNEXION</string>
-    <string name="login_credits">LaCommande V2.0</string>
+    <string name="login_credits">LaCommande V%1$s</string>
     <string name="login_credits_2">François Leparoux – ESEOmega 2016</string>
 
     <!-- Salt -->

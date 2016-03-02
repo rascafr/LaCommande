@@ -38,7 +38,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText etPassword;
     private Button bpConnect;
     private ProgressBar progressConnect;
-    private TextView tvProgress;
+    private TextView tvProgress, tvCredits;
 
     // Android
     private Context context;
@@ -65,8 +65,10 @@ public class LoginActivity extends AppCompatActivity {
         etPassword = (EditText) findViewById(R.id.etPassword);
         progressConnect = (ProgressBar) findViewById(R.id.progressConnect);
         tvProgress = (TextView) findViewById(R.id.tvProgress);
+        tvCredits = (TextView) findViewById(R.id.tvLoginCredits);
 
         // Set view
+        tvCredits.setText(getString(R.string.login_credits, BuildConfig.VERSION_NAME));
         String lastLogin = prefs.getString(Constants.PREFS_KEY_LOGIN, "");
         if (lastLogin.length() > 0) {
             etLogin.setText(lastLogin);

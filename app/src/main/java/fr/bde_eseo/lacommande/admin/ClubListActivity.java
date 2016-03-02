@@ -372,6 +372,8 @@ public class ClubListActivity extends AppCompatActivity {
         public AsyncClubs(Context context) {
             super(context);
             this.context = context;
+            pairs.put("login", DataStore.getInstance().getClubMember().getLogin());
+            pairs.put("password", DataStore.getInstance().getClubMember().getPassword());
         }
 
         @Override

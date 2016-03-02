@@ -48,16 +48,6 @@ public class HelpActivity extends AppCompatActivity {
             }
         });
         webView.loadUrl(Constants.API_HELP_GET);
-
-        /*
-
-        // Configure view
-        webView.getSettings().setLoadWithOverviewMode(true);
-        webView.getSettings().setUseWideViewPort(true);
-
-        // Load data
-        webView.loadUrl("file:///android_asset/help.html");
-        webView.setPadding(10, 0, 10, 0);*/
     }
 
     /**
