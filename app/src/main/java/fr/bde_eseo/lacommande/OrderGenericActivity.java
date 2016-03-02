@@ -11,6 +11,7 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -185,8 +186,6 @@ public class OrderGenericActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                debugInfo();
-
                 // Check cart is not empty
                 if (cartItems.size() == 0) {
                     new MaterialDialog.Builder(context)
@@ -200,7 +199,65 @@ public class OrderGenericActivity extends AppCompatActivity {
 
                         // If mode is Ingredient, end it
                         case MODE_INGREDIENTS:
-                            currentMode = MODE_ELEMENTS_PRIMARY;
+
+                            // Check if there is a menu
+                            if (selectedMenu != null) {
+
+                                // We're in a menu
+                                // Check if we've filled first sandwich item
+                                int nbSandw = ((MenuItem) selectedMenu).getNbSandw();
+                                int nbElems = ((MenuItem) selectedMenu).getNbElems();
+
+                                // Reach max of primary items : go to secondary if there is any, else close menu
+                                if (selectedMenu.getItems().size() >= nbSandw) {
+
+                                    if (nbElems > 0) {
+                                        currentMode = MODE_ELEMENTS_SECONDARY;
+                                        updateButtonProperties();
+                                        updateDisplayArray(0);
+
+                                        // Set helper text
+                                        setHelperText("Choisissez l'élément secondaire " + (selectedMenu.getItems().size() - nbSandw + 1) + "/" + nbElems + " du menu " + selectedMenu.getName());
+
+                                    } else {
+
+                                        // End selection
+                                        selectedMenu = null;
+                                        // Helper default
+                                        setHelperText("Sélectionnez une catégorie, puis ajoutez un menu ou un élément");
+                                        // Navigation mode
+                                        currentMode = MODE_NAVIGATE;
+                                        // Reset display
+                                        updateDisplayArray(0);
+                                        categoryAdapter.notifyDataSetChanged();
+                                    }
+                                } else {
+
+                                    // Else, we're missing another one sandwich / composed item
+                                    // So go back to primary mode
+                                    currentMode = MODE_ELEMENTS_PRIMARY;
+                                    updateButtonProperties();
+                                    updateDisplayArray(0);
+
+                                    // Set helper text
+                                    setHelperText("Choisissez l'élément principal " + (selectedMenu.getItems().size() + 1) + "/" + nbSandw + " du menu " + selectedMenu.getName());
+                                }
+
+                            } else {
+
+                                // We're not in a menu : validation must validate items and go back
+                                selectedElement = null;
+                                // Helper default
+                                setHelperText("Sélectionnez une catégorie, puis ajoutez un menu ou un élément");
+                                // Navigation mode
+                                currentMode = MODE_NAVIGATE;
+                                // Reset display
+                                updateDisplayArray(0);
+                                categoryAdapter.setSelectedCategory(0);
+                                updateButtonProperties();
+
+                            }
+
                             break;
 
                         // If mode is Primary, end it
@@ -266,13 +323,11 @@ public class OrderGenericActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                debugInfo();
-
                 switch (currentMode) {
 
                     // If mode is Primary, end it, delete parent item (menu
                     case MODE_ELEMENTS_PRIMARY:
-                    // If mode is Secondary, end it, delete parent item (menu)
+                        // If mode is Secondary, end it, delete parent item (menu)
                     case MODE_ELEMENTS_SECONDARY:
 
                         if (selectedMenu != null) {
@@ -315,6 +370,16 @@ public class OrderGenericActivity extends AppCompatActivity {
 
     private class CartAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+        private int selectedItemInCart = -1;
+
+        public int getSelectedItemInCart() {
+            return selectedItemInCart;
+        }
+
+        public void setSelectedItemInCart(int selectedItemInCart) {
+            this.selectedItemInCart = selectedItemInCart;
+        }
+
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
@@ -343,7 +408,7 @@ public class OrderGenericActivity extends AppCompatActivity {
                 ch.tvPrice.setVisibility(View.INVISIBLE);
             }
 
-            if (0 == position) {
+            if (selectedItemInCart == position) {
                 ch.rlBack.setBackgroundColor(getResources().getColor(R.color.md_orange_100));
             } else {
                 switch (ci.getLevel()) {
@@ -362,6 +427,7 @@ public class OrderGenericActivity extends AppCompatActivity {
             ch.rlBack.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
                     new MaterialDialog.Builder(OrderGenericActivity.this)
                             .title("Panier")
                             .content("Supprimer " + ci.getLinkedItem().getName() + " du panier ?")
@@ -370,8 +436,22 @@ public class OrderGenericActivity extends AppCompatActivity {
                             .onPositive(new MaterialDialog.SingleButtonCallback() {
                                 @Override
                                 public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
-                                    DataStore.getInstance().getCartItems().remove(ci.getLinkedItem());
-                                    updateCartArray();
+                                    if (currentMode != MODE_NAVIGATE) {
+                                        new MaterialDialog.Builder(context)
+                                                .title("Suppression impossible")
+                                                .content("Pour supprimer un élément du panier, vous devez être en mode navigation.\n\nTerminez de personnaliser l'élément / menu actuel puis réessayez ...")
+                                                .negativeText("Fermer")
+                                                .show();
+                                    } else if (ci.getLevel() != 0) {
+                                        new MaterialDialog.Builder(context)
+                                                .title("Suppression impossible")
+                                                .content("Vous ne pouvez pas supprimer du panier autre chose qu'un un menu ou un élément qui n'est pas contenu dans un menu.")
+                                                .negativeText("Fermer")
+                                                .show();
+                                    } else {
+                                        DataStore.getInstance().getCartItems().remove(ci.getLinkedItem());
+                                        updateCartArray();
+                                    }
                                 }
                             })
                             .show();
@@ -422,8 +502,10 @@ public class OrderGenericActivity extends AppCompatActivity {
             if (selectedCategory == position) {
                 ch.cardView.setCardBackgroundColor(getResources().getColor(R.color.md_orange_200));
             } else {
-                if (currentMode == MODE_NAVIGATE) ch.cardView.setCardBackgroundColor(getResources().getColor(R.color.md_blue_grey_50));
-                else ch.cardView.setCardBackgroundColor(getResources().getColor(R.color.md_grey_500));
+                if (currentMode == MODE_NAVIGATE)
+                    ch.cardView.setCardBackgroundColor(getResources().getColor(R.color.md_blue_grey_50));
+                else
+                    ch.cardView.setCardBackgroundColor(getResources().getColor(R.color.md_grey_500));
             }
 
             ch.cardView.setOnClickListener(new View.OnClickListener() {
@@ -534,7 +616,10 @@ public class OrderGenericActivity extends AppCompatActivity {
 
             if (Utilities.isNetworkDataValid(data)) {
                 DataStore.getInstance().setCafetData(data);
-                updateDisplayArray(0);
+                updateButtonProperties(); // update buttons
+                updateDisplayArray(0);    // update display
+                categoryAdapter.setSelectedCategory(0); // update category view, first category is selected
+                updateCartArray(); // update cart view
             } else {
                 Toast.makeText(OrderGenericActivity.this, "Erreur réseau", Toast.LENGTH_SHORT).show();
             }
@@ -636,6 +721,11 @@ public class OrderGenericActivity extends AppCompatActivity {
         );
         //tvTotal.setText(new DecimalFormat("0.00").format(DataStore.getInstance().getCartPrice()) + "€");
         tvTotal.setVisibility(View.GONE);
+        // scroll to last
+        if (cartItems.size() > 0) {
+            recyListResume.scrollToPosition(cartItems.size() - 1);
+            cartAdapter.setSelectedItemInCart(cartItems.size() - 1);
+        }
         cartAdapter.notifyDataSetChanged();
     }
 
@@ -718,8 +808,6 @@ public class OrderGenericActivity extends AppCompatActivity {
     // Decide about what a display item touch does
     void actionDisplayTouch(DisplayItem displayItem, RootItem linkItem) {
 
-        debugInfo();
-
         switch (linkItem.getType()) {
 
             // It's a menu ?
@@ -737,7 +825,7 @@ public class OrderGenericActivity extends AppCompatActivity {
                 if (nbSandwMax == 0) {
 
                     // Set helper text
-                    setHelperText("Choisissez l'élément secondaire " + nbElemActual + "/" + nbElemMax + " du menu " + menuItem.getName());
+                    setHelperText("Choisissez l'élément secondaire " + (nbElemActual - nbSandwMax) + "/" + nbElemMax + " du menu " + menuItem.getName());
 
                     // Secondary Element chooser mode only
                     currentMode = MODE_ELEMENTS_SECONDARY;
@@ -824,9 +912,9 @@ public class OrderGenericActivity extends AppCompatActivity {
 
                         selectedMenu.addItem(elementItem);
 
-                        if (selectedMenu.getItems().size() < ((MenuItem) selectedMenu).getNbElems()) {
+                        if (selectedMenu.getItems().size() < ((MenuItem) selectedMenu).getNbElems() + ((MenuItem) selectedMenu).getNbSandw()) {
                             // Set helper text
-                            setHelperText("Choisissez l'élément secondaire " + (selectedMenu.getItems().size() + 1) + "/" + ((MenuItem) selectedMenu).getNbElems() + " du menu " + selectedMenu.getName());
+                            setHelperText("Choisissez l'élément secondaire " + ((selectedMenu.getItems().size() + 1) - ((MenuItem) selectedMenu).getNbElems() + 1) + "/" + ((MenuItem) selectedMenu).getNbElems() + " du menu " + selectedMenu.getName());
                         } else {
                             // End selection
                             selectedMenu = null;
@@ -877,8 +965,6 @@ public class OrderGenericActivity extends AppCompatActivity {
                 }
                 break;
         }
-
-        debugInfo();
     }
 
     // Search for an element in a sub item
@@ -918,6 +1004,13 @@ public class OrderGenericActivity extends AppCompatActivity {
                 buttonCancel.setVisibility(View.VISIBLE);
                 break;
 
+            // Secondary mode, possibility is only cancel (autovalidate)
+            case MODE_ELEMENTS_SECONDARY:
+                buttonValid.setVisibility(View.GONE);
+                buttonCancel.setText("Annuler");
+                buttonCancel.setVisibility(View.VISIBLE);
+                break;
+
             case MODE_INGREDIENTS:
                 buttonValid.setText("Valider");
                 buttonValid.setVisibility(View.VISIBLE);
@@ -927,6 +1020,15 @@ public class OrderGenericActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Menu : clear cart
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_order, menu);
+        return true;
+    }
+
     // Go back with menu
     @Override
     public boolean onOptionsItemSelected(android.view.MenuItem item) {
@@ -934,6 +1036,34 @@ public class OrderGenericActivity extends AppCompatActivity {
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
                 OrderGenericActivity.this.onBackPressed();
+                return true;
+
+            // Respond to the clean cart action
+            case R.id.action_clean:
+                new MaterialDialog.Builder(context)
+                        .title("Vider le panier ?")
+                        .content("Le contenu du panier sera supprimé.\nContinuer ?")
+                        .positiveText("Oui")
+                        .negativeText("Annuler")
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(MaterialDialog materialDialog, DialogAction dialogAction) {
+                                DataStore.getInstance().getCartItems().clear();
+                                updateCartArray();
+
+                                // End selection
+                                selectedMenu = null;
+                                selectedElement = null;
+                                // Helper default
+                                setHelperText("Sélectionnez une catégorie, puis ajoutez un menu ou un élément");
+                                // Navigation mode
+                                currentMode = MODE_NAVIGATE;
+                                // Reset display
+                                updateDisplayArray(0);
+                                categoryAdapter.notifyDataSetChanged();
+                            }
+                        })
+                        .show();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -953,17 +1083,5 @@ public class OrderGenericActivity extends AppCompatActivity {
                     }
                 })
                 .show();
-    }
-
-    /**
-     * Debug
-     */
-    private void debugInfo() {
-        String s = "";
-        if (currentMode == 0) s = "MODE_NAVIGATE";
-        else if (currentMode == 1) s = "MODE_INGREDIENTS";
-        else if (currentMode == 2) s = "MODE_ELEMENTS_PRIMARY";
-        else if (currentMode == 3) s = "MODE_ELEMENTS_SECONDARY)";
-        Log.d("DEBUG", ", currentMode="+s);
     }
 }

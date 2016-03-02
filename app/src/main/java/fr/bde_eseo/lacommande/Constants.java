@@ -10,24 +10,12 @@ package fr.bde_eseo.lacommande;
 public class Constants {
 
     /**
-     * URL LIST
-     */
-
-    // Server
-    public final static String URL_SERVER = "http://217.199.187.59/francoisle.fr/lacommande/";
-
-    // Admin
-    public final static String URL_CLUBS_LISTS = URL_SERVER + "apps-lacommande/v10/getClubList.php";
-    public final static String URL_CLUBS_SYNC = URL_SERVER + "apps-lacommande/v10/syncClubs.php";
-    public final static String URL_PLANNING_GET = URL_SERVER + "apps-lacommande/v10/getPlanning.php";
-    public final static String URL_PLANNING_SYNC = URL_SERVER + "apps-lacommande/v10/syncPlanning.php";
-
-    /**
      * API Urls
      */
 
     // Base API URL
-    public final static String URL_API = "http://217.199.187.59/francoisle.fr/lacommande/api/desk/";
+    //public final static String URL_API = "http://217.199.187.59/francoisle.fr/lacommande/api/desk/";
+    public final static String URL_API = "https://web59.secure-secure.co.uk/francoisle.fr/lacommande/api/desk/"; // secure https
 
     // Connect / login
     public final static String API_CLUB_LOGIN = URL_API + "club/login.php";
@@ -60,6 +48,15 @@ public class Constants {
     // Stock
     public final static String API_STOCK_LIST = URL_API + "stock/list.php";
     public final static String API_STOCK_UPDATE = URL_API + "stock/update.php";
+
+    // Planning
+
+    public final static String API_PLANNING_GET = URL_API + "planning/list.php";
+    public final static String API_PLANNING_SYNC = URL_API + "planning/update.php";
+
+    // Clubs
+    public final static String API_CLUBS_LIST = URL_API + "club/list.php";
+    public final static String API_CLUBS_SYNC = URL_API + "club/update.php";
 
     /**
      * Intent keys

@@ -1,5 +1,6 @@
 package fr.bde_eseo.lacommande.admin;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -29,11 +30,13 @@ import fr.bde_eseo.lacommande.utils.Utilities;
 public class ServiceAsyncDialog extends AsyncTask<String, String, String> {
 
     private Context context;
+    private Activity activity;
     private MaterialDialog materialDialog;
     private ClubMember clubMember;
 
-    public ServiceAsyncDialog(Context context) {
+    public ServiceAsyncDialog(Context context, Activity activity) {
         this.context = context;
+        this.activity = activity;
         this.clubMember = DataStore.getInstance().getClubMember();
     }
 
@@ -63,6 +66,9 @@ public class ServiceAsyncDialog extends AsyncTask<String, String, String> {
                         // List parameters
                         JSONObject obj = new JSONObject(data);
                         String service = obj.getString("service_dynamic");
+
+                        // Hide keyboard (29/02/2016 discovered bug)
+                        Utilities.hideSoftKeyboard(activity);
 
                         // Show dialog
                         new MaterialDialog.Builder(context)

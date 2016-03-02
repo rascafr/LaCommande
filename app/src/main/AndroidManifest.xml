@@ -70,6 +70,13 @@
             android:screenOrientation="landscape"
             android:theme="@style/AppTheme" >
         </activity>
+
+        <activity
+            android:name="fr.bde_eseo.lacommande.HelpActivity"
+            android:label="@string/activity_help"
+            android:screenOrientation="landscape"
+            android:theme="@style/AppTheme" >
+        </activity>
     </application>
 
 </manifest>

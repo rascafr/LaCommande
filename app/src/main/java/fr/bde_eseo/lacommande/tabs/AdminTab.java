@@ -90,7 +90,7 @@ public class AdminTab extends Fragment {
                         break;
 
                     case ACTION_MESSAGE:
-                        new ServiceAsyncDialog(getActivity()).execute();
+                        new ServiceAsyncDialog(getActivity(), getActivity()).execute();
                         break;
 
                     case ACTION_MENUS:

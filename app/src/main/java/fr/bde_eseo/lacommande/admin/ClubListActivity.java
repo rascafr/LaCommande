@@ -1,5 +1,6 @@
 package fr.bde_eseo.lacommande.admin;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,6 +40,8 @@ import java.util.Locale;
 import fr.bde_eseo.lacommande.Constants;
 import fr.bde_eseo.lacommande.R;
 import fr.bde_eseo.lacommande.model.DataStore;
+import fr.bde_eseo.lacommande.utils.APIAsyncTask;
+import fr.bde_eseo.lacommande.utils.APIResponse;
 import fr.bde_eseo.lacommande.utils.ConnexionUtils;
 import fr.bde_eseo.lacommande.utils.EncryptUtils;
 import fr.bde_eseo.lacommande.utils.Utilities;
@@ -70,9 +74,13 @@ public class ClubListActivity extends AppCompatActivity {
     // Modification happened ?
     private boolean hasChanged = false;
 
+    // Android
+    private Context context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        context = this;
 
         // Set UI Main Layout
         setContentView(R.layout.activity_club_list);
@@ -100,8 +108,8 @@ public class ClubListActivity extends AppCompatActivity {
         recyList.setAdapter(mAdapter);
 
         // Download data and fill array
-        AsyncClubs asyncClubs = new AsyncClubs();
-        asyncClubs.execute(Constants.URL_CLUBS_LISTS);
+        AsyncClubs asyncClubs = new AsyncClubs(context);
+        asyncClubs.execute(Constants.API_CLUBS_LIST);
 
         // Add new club action
         fabAdd.setOnClickListener(new View.OnClickListener() {
@@ -265,8 +273,8 @@ public class ClubListActivity extends AppCompatActivity {
                 clubJSONstr = "[" + clubJSONstr + "]";
 
                 // Send data to server
-                AsyncServer asyncServer = new AsyncServer();
-                asyncServer.execute(Constants.URL_CLUBS_SYNC);
+                AsyncServer asyncServer = new AsyncServer(context);
+                asyncServer.execute(Constants.API_CLUBS_SYNC);
             }
         });
 
@@ -303,14 +311,28 @@ public class ClubListActivity extends AppCompatActivity {
     /**
      * Custom Async task to send data to server
      */
-    private class AsyncServer extends AsyncTask<String, String, String> {
+    private class AsyncServer extends APIAsyncTask {
 
         private MaterialDialog dialog;
+        private Context context;
+
+        public AsyncServer(Context context) {
+            super(context);
+            this.context = context;
+            try {
+                String b64data = Base64.encodeToString(clubJSONstr.getBytes("UTF-8"), Base64.NO_WRAP);
+                pairs.put("login", DataStore.getInstance().getClubMember().getLogin());
+                pairs.put("password", DataStore.getInstance().getClubMember().getPassword());
+                pairs.put("data", b64data);
+                pairs.put("hash", EncryptUtils.md5(b64data + getResources().getString(R.string.salt_sync_club)));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
 
         @Override
         protected void onPreExecute() {
-            super.onPreExecute();
-            dialog = new MaterialDialog.Builder(ClubListActivity.this)
+            dialog = new MaterialDialog.Builder(context)
                     .title("Mise à jour")
                     .content("Veuillez patienter ...")
                     .cancelable(false)
@@ -320,13 +342,12 @@ public class ClubListActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(String data) {
-            super.onPostExecute(data);
+        protected void onPostExecute(APIResponse apiResponse) {
 
             dialog.hide();
 
-            if (Utilities.isNetworkDataValid(data) && data.startsWith("1")) {
-                Toast.makeText(ClubListActivity.this, "Données synchronisées !", Toast.LENGTH_SHORT).show();
+            if (apiResponse.isValid()) {
+                Toast.makeText(context, "Données synchronisées !", Toast.LENGTH_SHORT).show();
 
                 // Flag dataset cleared
                 hasChanged = false;
@@ -335,21 +356,8 @@ public class ClubListActivity extends AppCompatActivity {
                 ClubListActivity.this.onBackPressed();
 
             } else {
-                Toast.makeText(ClubListActivity.this, "Échec de la synchronisation", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Échec de la synchronisation : " + apiResponse.getError(), Toast.LENGTH_SHORT).show();
             }
-        }
-
-        @Override
-        protected String doInBackground(String... url) {
-            HashMap<String, String> pairs = new HashMap<>();
-            try {
-                String b64data = Base64.encodeToString(clubJSONstr.getBytes("UTF-8"), Base64.NO_WRAP);
-                pairs.put("data", b64data);
-                pairs.put("hash", EncryptUtils.md5(b64data + getResources().getString(R.string.salt_sync_club)));
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-            return ConnexionUtils.postServerData(url[0], pairs);
         }
     }
 
@@ -357,7 +365,14 @@ public class ClubListActivity extends AppCompatActivity {
     /**
      * Custom Async task downloader
      */
-    private class AsyncClubs extends AsyncTask<String, String, String> {
+    private class AsyncClubs extends APIAsyncTask {
+
+        private Context context;
+
+        public AsyncClubs(Context context) {
+            super(context);
+            this.context = context;
+        }
 
         @Override
         protected void onPreExecute() {
@@ -373,14 +388,13 @@ public class ClubListActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(String data) {
-            super.onPostExecute(data);
+        protected void onPostExecute(APIResponse apiResponse) {
 
             progressLoad.setVisibility(View.GONE);
 
-            if (Utilities.isNetworkDataValid(data)) {
+            if (apiResponse.isValid()) {
                 try {
-                    JSONArray jsonArray = new JSONArray(data);
+                    JSONArray jsonArray = apiResponse.getJsonData().getJSONArray("clubs");
                     for (int i = 0; i < jsonArray.length(); i++) {
                         clubItems.add(new ClubItem(jsonArray.getJSONObject(i)));
                     }
@@ -391,16 +405,11 @@ public class ClubListActivity extends AppCompatActivity {
 
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Toast.makeText(ClubListActivity.this, "Erreur serveur", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Erreur serveur", Toast.LENGTH_SHORT).show();
                 }
             } else {
-                Toast.makeText(ClubListActivity.this, "Erreur réseau", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, apiResponse.getError(), Toast.LENGTH_SHORT).show();
             }
-        }
-
-        @Override
-        protected String doInBackground(String... url) {
-            return ConnexionUtils.postServerData(url[0], null);
         }
     }
 

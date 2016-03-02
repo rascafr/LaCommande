@@ -1,6 +1,7 @@
 package fr.bde_eseo.lacommande.admin;
 
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -36,6 +37,9 @@ import java.util.Locale;
 
 import fr.bde_eseo.lacommande.Constants;
 import fr.bde_eseo.lacommande.R;
+import fr.bde_eseo.lacommande.model.DataStore;
+import fr.bde_eseo.lacommande.utils.APIAsyncTask;
+import fr.bde_eseo.lacommande.utils.APIResponse;
 import fr.bde_eseo.lacommande.utils.ConnexionUtils;
 import fr.bde_eseo.lacommande.utils.EncryptUtils;
 import fr.bde_eseo.lacommande.utils.Utilities;
@@ -57,14 +61,18 @@ public class PlanningActivity extends AppCompatActivity {
     private FloatingActionButton fabSave;
 
     // JSON data as String
-    private String clubJSONstr;
+    private String planningJSONstr;
 
     // Modification happened ?
     private boolean hasChanged = false;
 
+    // Android
+    private Context context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        context = this;
 
         // Set UI Main Layout
         setContentView(R.layout.activity_planning);
@@ -91,8 +99,8 @@ public class PlanningActivity extends AppCompatActivity {
         recyList.setAdapter(mAdapter);
 
         // Download data and fill array
-        AsyncPlanning asyncPlanning = new AsyncPlanning();
-        asyncPlanning.execute(Constants.URL_PLANNING_GET);
+        AsyncPlanning asyncPlanning = new AsyncPlanning(context);
+        asyncPlanning.execute(Constants.API_PLANNING_GET);
 
         // Save action
         fabSave.setOnClickListener(new View.OnClickListener() {
@@ -100,18 +108,18 @@ public class PlanningActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 // Create JSON String
-                clubJSONstr = "";
+                planningJSONstr = "";
                 for (int i=0;i<dayItems.size();i++) {
-                    if (clubJSONstr.length() > 0) {
-                        clubJSONstr += ",";
+                    if (planningJSONstr.length() > 0) {
+                        planningJSONstr += ",";
                     }
-                    clubJSONstr += dayItems.get(i).toJSONstr(i);
+                    planningJSONstr += dayItems.get(i).toJSONstr(i);
                 }
-                clubJSONstr = "[" + clubJSONstr + "]";
+                planningJSONstr = "[" + planningJSONstr + "]";
 
                 // Send data to server
-                AsyncServer asyncServer = new AsyncServer();
-                asyncServer.execute(Constants.URL_PLANNING_SYNC);
+                AsyncServer asyncServer = new AsyncServer(context);
+                asyncServer.execute(Constants.API_PLANNING_SYNC);
 
             }
         });
@@ -255,14 +263,30 @@ public class PlanningActivity extends AppCompatActivity {
     /**
      * Custom Async task to send data to server
      */
-    private class AsyncServer extends AsyncTask<String, String, String> {
+    private class AsyncServer extends APIAsyncTask {
 
         private MaterialDialog dialog;
+        private Context context;
+
+        public AsyncServer(Context context) {
+            super(context);
+            this.context = context;
+            this.pairs = new HashMap<>();
+            try {
+                String b64data = Base64.encodeToString(planningJSONstr.getBytes("UTF-8"), Base64.NO_WRAP);
+                pairs.put("login", DataStore.getInstance().getClubMember().getLogin());
+                pairs.put("password", DataStore.getInstance().getClubMember().getPassword());
+                this.pairs.put("data", b64data);
+                this.pairs.put("hash", EncryptUtils.md5(b64data + getResources().getString(R.string.salt_sync_planning)));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            dialog = new MaterialDialog.Builder(PlanningActivity.this)
+            dialog = new MaterialDialog.Builder(context)
                     .title("Mise à jour")
                     .content("Veuillez patienter ...")
                     .cancelable(false)
@@ -272,13 +296,12 @@ public class PlanningActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(String data) {
-            super.onPostExecute(data);
+        protected void onPostExecute(APIResponse apiResponse) {
 
             dialog.hide();
 
-            if (Utilities.isNetworkDataValid(data) && data.startsWith("1")) {
-                Toast.makeText(PlanningActivity.this, "Données synchronisées !", Toast.LENGTH_SHORT).show();
+            if (apiResponse.isValid()) {
+                Toast.makeText(context, "Données synchronisées !", Toast.LENGTH_SHORT).show();
 
                 // Flag dataset cleared
                 hasChanged = false;
@@ -287,21 +310,8 @@ public class PlanningActivity extends AppCompatActivity {
                 PlanningActivity.this.onBackPressed();
 
             } else {
-                Toast.makeText(PlanningActivity.this, "Échec de la synchronisation", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Échec de la synchronisation : " + apiResponse.getError(), Toast.LENGTH_SHORT).show();
             }
-        }
-
-        @Override
-        protected String doInBackground(String... url) {
-            HashMap<String, String> pairs = new HashMap<>();
-            try {
-                String b64data = Base64.encodeToString(clubJSONstr.getBytes("UTF-8"), Base64.NO_WRAP);
-                pairs.put("data", b64data);
-                pairs.put("hash", EncryptUtils.md5(b64data + getResources().getString(R.string.salt_sync_planning)));
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-            return ConnexionUtils.postServerData(url[0], pairs);
         }
     }
 
@@ -309,7 +319,14 @@ public class PlanningActivity extends AppCompatActivity {
     /**
      * Custom async task downloader for planning list
      */
-    private class AsyncPlanning extends AsyncTask<String, String, String> {
+    private class AsyncPlanning extends APIAsyncTask {
+
+        private Context context;
+
+        public AsyncPlanning(Context context) {
+            super(context);
+            this.context = context;
+        }
 
         @Override
         protected void onPreExecute() {
@@ -325,14 +342,13 @@ public class PlanningActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(String data) {
-            super.onPostExecute(data);
+        protected void onPostExecute(APIResponse apiResponse) {
 
             progressLoad.setVisibility(View.GONE);
 
-            if (Utilities.isNetworkDataValid(data)) {
+            if (apiResponse.isValid()) {
                 try {
-                    JSONArray jsonArray = new JSONArray(data);
+                    JSONArray jsonArray = apiResponse.getJsonData().getJSONArray("planning");
                     for (int i = 0; i < jsonArray.length(); i++) {
                         dayItems.add(new DayItem(jsonArray.getJSONObject(i)));
                     }
@@ -342,16 +358,11 @@ public class PlanningActivity extends AppCompatActivity {
 
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Toast.makeText(PlanningActivity.this, "Erreur serveur", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Erreur serveur", Toast.LENGTH_SHORT).show();
                 }
             } else {
-                Toast.makeText(PlanningActivity.this, "Erreur réseau", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, apiResponse.getError(), Toast.LENGTH_SHORT).show();
             }
-        }
-
-        @Override
-        protected String doInBackground(String... url) {
-            return ConnexionUtils.postServerData(url[0], null);
         }
     }
 

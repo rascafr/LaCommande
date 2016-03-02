@@ -1,5 +1,7 @@
 package fr.bde_eseo.lacommande.utils;
 
+import android.util.Log;
+
 import org.json.JSONObject;
 
 /**

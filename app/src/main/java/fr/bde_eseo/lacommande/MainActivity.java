@@ -1,6 +1,7 @@
 package fr.bde_eseo.lacommande;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -112,6 +113,14 @@ public class MainActivity extends AppCompatActivity {
                         .show();
 
                 return true;
+
+            // respond to help action
+            case R.id.action_help:
+
+                Intent i = new Intent(context, HelpActivity.class);
+                startActivity(i);
+
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
