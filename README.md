@@ -9,7 +9,8 @@ Application Android du BDE ESEOmega (2015 - 2016) pour tablette permettant la ge
 - Historique : Liste des commandes depuis le début
 - Impayés : Gestion des impayés (liste et régularisation)
 - Déconnexion : fermeture cafet et déconnexion de l'app tablette
-- Aide intégrée → l'aide HTML est en cours de rédaction, passage sur le serveur ?
+- Aide intégrée → mise à jour depuis le serveur ?
+- Connexion en HTTPS (depuis web59)
 
 **Restant :**
 Menus & Éléments (modification, changement des prix) → moins urgent
