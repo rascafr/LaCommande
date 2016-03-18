@@ -1,7 +1,7 @@
 # LaCommande
 Application Android du BDE ESEOmega (2015 - 2016) pour tablette permettant la gestion des commandes de la cafetéria
 
-## Release actuelle : V2.1 (4)
+## Release actuelle : V2.2 (6)
 
 - Fonctions administrateur : Comptes clubs, Gestion des stocks, Planning, Menus & Éléments, Paramètres BDD, Message de service
 - Comptoir : Commander, gestion des clients (ajout / consultation)
