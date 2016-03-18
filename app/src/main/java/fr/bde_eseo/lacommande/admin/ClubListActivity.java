@@ -36,6 +36,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import fr.bde_eseo.lacommande.Constants;
 import fr.bde_eseo.lacommande.R;
@@ -131,7 +133,11 @@ public class ClubListActivity extends AppCompatActivity {
 
                                 etAddLogin.setText(etAddLogin.getText().toString().trim().toLowerCase(Locale.FRANCE));
 
-                                if (!isEditTextValueOk(etAddLogin, etAddName, etAddPassword)) {
+                                if (!isLoginCorrect(etAddLogin)) {
+
+                                    Toast.makeText(ClubListActivity.this, "Un login ne peut comporter que des caractères alphanumériques et des tirets", Toast.LENGTH_SHORT).show();
+
+                                } else if (!isEditTextValueOk(etAddLogin, etAddName, etAddPassword)) {
 
                                     Toast.makeText(ClubListActivity.this, "Merci de bien vouloir renseigner tous les champs !", Toast.LENGTH_SHORT).show();
 
@@ -149,6 +155,9 @@ public class ClubListActivity extends AppCompatActivity {
                                                     checkAddAdmin.isChecked() ? 1 : 0,
                                                     null,
                                                     "",
+                                                    0,
+                                                    0,
+                                                    0,
                                                     0
                                             )
                                     );
@@ -419,7 +428,27 @@ public class ClubListActivity extends AppCompatActivity {
      * Check edittext's content
      */
     private boolean isEditTextValueOk (EditText etLogin, EditText etName, EditText etPassword) {
-        return etName.getText().toString().length() > 0 && etPassword.getText().toString().length() > 0 && etLogin.getText().toString().length() > 0;
+        return
+                etName.getText().toString().length() > 0 &&
+                        etPassword.getText().toString().length() > 0 &&
+                        etLogin.getText().toString().length() > 0;
+    }
+
+    /**
+     * Check login value
+     */
+    private boolean isLoginCorrect (EditText etLogin) {
+        return IsMatch(etLogin.getText().toString(), "^[a-zA-Z0-9_-]{4,}$");
+    }
+
+    private static boolean IsMatch(String s, String pattern) {
+        try {
+            Pattern patt = Pattern.compile(pattern);
+            Matcher matcher = patt.matcher(s);
+            return matcher.matches();
+        } catch (RuntimeException e) {
+            return false;
+        }
     }
 
     /**
@@ -476,7 +505,7 @@ public class ClubListActivity extends AppCompatActivity {
     private class ClubItem {
         private String name, login, password, lastconnect, img, sellevent;
         private boolean isHeader, enabled;
-        private int level, num;
+        private int level, hasNews, hasCamtar, hasTresor, hasIngenews;
 
         // For header
         public ClubItem(String name) {
@@ -485,7 +514,7 @@ public class ClubListActivity extends AppCompatActivity {
         }
 
         // For club item
-        public ClubItem(String name, String login, String password, String lastconnect, boolean enabled, int level, String sellevent, String img, int num) {
+        public ClubItem(String name, String login, String password, String lastconnect, boolean enabled, int level, String sellevent, String img, int hasNews, int hasCamtar, int hasTresor, int hasIngenews) {
             this.name = name;
             this.login = login;
             this.password = password;
@@ -495,7 +524,10 @@ public class ClubListActivity extends AppCompatActivity {
             this.isHeader = false;
             this.sellevent = sellevent;
             this.img = img;
-            this.num = num;
+            this.hasNews = hasNews;
+            this.hasCamtar = hasCamtar;
+            this.hasTresor = hasTresor;
+            this.hasIngenews = hasIngenews;
         }
 
         // For club item with JSON data
@@ -509,7 +541,10 @@ public class ClubListActivity extends AppCompatActivity {
                     obj.getInt("level"),
                     obj.getString("sellevent"),
                     obj.getString("image"),
-                    obj.getInt("num")
+                    obj.getInt("hasNews"),
+                    obj.getInt("hasCamtar"),
+                    obj.getInt("hasTresor"),
+                    obj.getInt("hasIngenews")
             );
         }
 
@@ -583,7 +618,10 @@ public class ClubListActivity extends AppCompatActivity {
             json += "\"level\":\"" + this.level + "\",";
             json += "\"sellevent\":\"" + this.sellevent + "\",";
             json += "\"image\":\"" + this.img + "\",";
-            json += "\"num\":\"" + this.num + "\"";
+            json += "\"hasNews\":\"" + this.hasNews + "\",";
+            json += "\"hasCamtar\":\"" + this.hasCamtar + "\",";
+            json += "\"hasIngenews\":\"" + this.hasIngenews + "\",";
+            json += "\"hasTresor\":\"" + this.hasTresor + "\"";
             json += "}";
 
             return json;
@@ -656,8 +694,12 @@ public class ClubListActivity extends AppCompatActivity {
                                             @Override
                                             public void onPositive(MaterialDialog dialog) {
 
-                                                etLogin.setText(etLogin.getText().toString().trim().toLowerCase(Locale.FRANCE));
+                                                // Login non modifiable #naudetPLS
+                                                etLogin.setEnabled(false);
 
+                                                //etLogin.setText(etLogin.getText().toString().trim().toLowerCase(Locale.FRANCE));
+
+                                                // La suite des vérifs ne sert à rien
                                                 if (!isEditTextValueOk(etLogin, etName, etName)) {
 
                                                     Toast.makeText(ClubListActivity.this, "Merci de bien vouloir renseigner tous les champs !", Toast.LENGTH_SHORT).show();
@@ -725,6 +767,7 @@ public class ClubListActivity extends AppCompatActivity {
                                 bpRandom = (RelativeLayout) view.findViewById(R.id.rlRandom);
                                 etName.setText(ci.getName());
                                 etLogin.setText(ci.getLogin());
+                                etLogin.setEnabled(false);
                                 etPassword.setHint("Nouveau mot de passe");
                                 checkAdmin.setChecked(ci.getLevel() != 0);
                                 checkEnabled.setChecked(ci.isEnabled());
